@@ -2,9 +2,6 @@
 {
     partial class frmLogin
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
         private System.Windows.Forms.Panel pnlMain;
         private System.Windows.Forms.Label lblTitle;
@@ -16,10 +13,6 @@
         private System.Windows.Forms.Button btnExit;
         private System.Windows.Forms.CheckBox chkShowPassword;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -29,12 +22,6 @@
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
-
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
             this.pnlMain = new System.Windows.Forms.Panel();
@@ -73,10 +60,10 @@
             this.chkShowPassword.Location = new System.Drawing.Point(43, 199);
             this.chkShowPassword.Name = "chkShowPassword";
             this.chkShowPassword.Size = new System.Drawing.Size(121, 19);
-            this.chkShowPassword.TabIndex = 6;
+            this.chkShowPassword.TabIndex = 3;
             this.chkShowPassword.Text = "Hiển thị mật khẩu";
             this.chkShowPassword.UseVisualStyleBackColor = true;
-            this.chkShowPassword.Click += new System.EventHandler(this.ChkShowPassword_CheckedChanged);
+            this.chkShowPassword.CheckedChanged += new System.EventHandler(this.ChkShowPassword_CheckedChanged);
             // 
             // btnExit
             // 
@@ -88,7 +75,7 @@
             this.btnExit.Location = new System.Drawing.Point(201, 233);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(141, 39);
-            this.btnExit.TabIndex = 8;
+            this.btnExit.TabIndex = 5;
             this.btnExit.Text = "THOÁT";
             this.btnExit.UseVisualStyleBackColor = false;
             this.btnExit.Click += new System.EventHandler(this.BtnExit_Click);
@@ -103,7 +90,7 @@
             this.btnLogin.Location = new System.Drawing.Point(43, 233);
             this.btnLogin.Name = "btnLogin";
             this.btnLogin.Size = new System.Drawing.Size(141, 39);
-            this.btnLogin.TabIndex = 7;
+            this.btnLogin.TabIndex = 4;
             this.btnLogin.Text = "ĐĂNG NHẬP";
             this.btnLogin.UseVisualStyleBackColor = false;
             this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
@@ -114,10 +101,9 @@
             this.txtPassword.Location = new System.Drawing.Point(43, 168);
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.Size = new System.Drawing.Size(301, 29);
-            this.txtPassword.TabIndex = 5;
+            this.txtPassword.TabIndex = 2;
             this.txtPassword.UseSystemPasswordChar = true;
-            //this.txtPassword.Click += new System.EventHandler(this.txtPassword_TextChanged);
-           //this.txtPassword.TextChanged += new System.EventHandler(this.txtPassword_TextChanged);
+            this.txtPassword.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtPassword_KeyPress);
             // 
             // txtUsername
             // 
@@ -125,9 +111,8 @@
             this.txtUsername.Location = new System.Drawing.Point(43, 108);
             this.txtUsername.Name = "txtUsername";
             this.txtUsername.Size = new System.Drawing.Size(301, 29);
-            this.txtUsername.TabIndex = 3;
-            //this.txtUsername.Click += new System.EventHandler(this.txtUsername_TextChanged);
-            //this.txtUsername.TextChanged += new System.EventHandler(this.txtUsername_TextChanged);
+            this.txtUsername.TabIndex = 1;
+            this.txtUsername.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtUsername_KeyPress);
             // 
             // lblPassword
             // 
@@ -136,7 +121,7 @@
             this.lblPassword.Location = new System.Drawing.Point(43, 147);
             this.lblPassword.Name = "lblPassword";
             this.lblPassword.Size = new System.Drawing.Size(75, 20);
-            this.lblPassword.TabIndex = 4;
+            this.lblPassword.TabIndex = 0;
             this.lblPassword.Text = "Mật Khẩu:";
             // 
             // lblUsername
@@ -146,7 +131,7 @@
             this.lblUsername.Location = new System.Drawing.Point(43, 86);
             this.lblUsername.Name = "lblUsername";
             this.lblUsername.Size = new System.Drawing.Size(105, 20);
-            this.lblUsername.TabIndex = 2;
+            this.lblUsername.TabIndex = 0;
             this.lblUsername.Text = "Mã Nhân Viên:";
             // 
             // lblTitle
@@ -157,7 +142,7 @@
             this.lblTitle.Location = new System.Drawing.Point(23, 20);
             this.lblTitle.Name = "lblTitle";
             this.lblTitle.Size = new System.Drawing.Size(340, 37);
-            this.lblTitle.TabIndex = 1;
+            this.lblTitle.TabIndex = 0;
             this.lblTitle.Text = "HỆ THỐNG QUẢN LÝ BAR";
             this.lblTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
@@ -167,18 +152,15 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(385, 316);
             this.Controls.Add(this.pnlMain);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
             this.Name = "frmLogin";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Đăng Nhập";
-            this.Click += new System.EventHandler(this.frmLogin_Load);
+            this.Text = "Đăng Nhập - Hệ Thống Quản Lý Bar";
+            this.Load += new System.EventHandler(this.frmLogin_Load);
             this.pnlMain.ResumeLayout(false);
             this.pnlMain.PerformLayout();
             this.ResumeLayout(false);
-
         }
-
-        #endregion
     }
 }
-
