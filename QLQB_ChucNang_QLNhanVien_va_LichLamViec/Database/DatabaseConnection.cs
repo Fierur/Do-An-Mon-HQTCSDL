@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec.Database
 {
     public class DatabaseConnection
     {
-        private static string serverName = "26.71.28.188";
+        private static string serverName = "26.71.28.188\\MSSQL16SERVER";
         private static string databaseName = "QuanLyQuanBar";
         private static string connectionString;
         private static SqlConnection currentConnection = null;
@@ -17,11 +14,13 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec.Database
         /// <summary>
         /// Dùng thông tin user + password từ form để đăng nhập
         /// </summary>
-        public static bool TestLogin(string username, string password, out string errorMessage, out string tenNV, out string maQuyen)
+        public static bool TestLogin(string username, string password, out string errorMessage, out string tenNV, out string maQuyen, out string tenQuyen, out bool isQuanLy)
         {
             errorMessage = "";
             tenNV = "";
             maQuyen = "";
+            tenQuyen = "";
+            isQuanLy = false;
 
             try
             {
@@ -34,7 +33,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec.Database
                     conn.Open();
 
                     // Kiểm tra xem user có tồn tại trong bảng NhanVien không
-                    string query = "SELECT TenNV, MaQuyen FROM NhanVien WHERE MaNV = @MaNV";
+                    string query = "SELECT TenNV, n.MaQuyen, TenQuyen FROM NhanVien n join Quyen q ON q.MaQuyen = n.MaQuyen WHERE MaNV =  @MaNV";
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@MaNV", username);
@@ -44,7 +43,24 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec.Database
                             {
                                 tenNV = reader["TenNV"].ToString();
                                 maQuyen = reader["MaQuyen"].ToString();
+                                tenQuyen = reader["TenQuyen"].ToString();
                             }
+                            else
+                            {
+                                errorMessage = "Tài khoản không tồn tại trong hệ thống!";
+                                return false;
+                            }
+                        }
+                    }
+
+                    // Kiểm tra user có thuộc Role_QuanLy không
+                    string roleQuery = "SELECT IS_MEMBER('Role_QuanLy') AS IsQuanLy";
+                    using (SqlCommand cmdRole = new SqlCommand(roleQuery, conn))
+                    {
+                        object result = cmdRole.ExecuteScalar();
+                        if (result != null && result != DBNull.Value)
+                        {
+                            isQuanLy = Convert.ToInt32(result) == 1;
                         }
                     }
 
@@ -58,8 +74,10 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec.Database
                 if (ex.Number == 18456)
                     errorMessage = "Tên đăng nhập hoặc mật khẩu không đúng!";
                 else
-                    errorMessage = "Lỗi kết nối: " + ex.Message;
-
+                {
+                    //errorMessage = "Lỗi kết nối: " + ex.Message;
+                    errorMessage = "Bạn không phải là quản lý!\nVui lòng đăng nhập thông qua app nhân viên";
+                }
                 return false;
             }
             catch (Exception ex)
@@ -71,13 +89,23 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec.Database
 
         public static SqlConnection GetConnection()
         {
-            if (currentConnection == null || currentConnection.State == System.Data.ConnectionState.Closed)
+            if (currentConnection == null || currentConnection.State == ConnectionState.Closed)
+            {
+                if (string.IsNullOrEmpty(connectionString))
+                {
+                    throw new Exception("Chưa đăng nhập! Vui lòng đăng nhập lại.");
+                }
                 currentConnection = new SqlConnection(connectionString);
+            }
             return currentConnection;
         }
 
         public static SqlConnection OpenConnection()
         {
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new Exception("Chưa đăng nhập! Vui lòng đăng nhập lại.");
+            }
             SqlConnection conn = new SqlConnection(connectionString);
             conn.Open();
             return conn;
@@ -85,9 +113,15 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec.Database
 
         public static void CloseConnection()
         {
-            if (currentConnection != null && currentConnection.State == System.Data.ConnectionState.Open)
+            if (currentConnection != null && currentConnection.State == ConnectionState.Open)
                 currentConnection.Close();
+        }
+
+        public static void ClearConnection()
+        {
+            CloseConnection();
+            connectionString = null;
+            currentConnection = null;
         }
     }
 }
-

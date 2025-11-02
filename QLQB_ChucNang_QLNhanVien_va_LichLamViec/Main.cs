@@ -25,7 +25,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         private void frmMain_Load(object sender, EventArgs e)
         {
             // Hiển thị thông tin user
-            lblWelcome.Text = $"Chào mừng, {SessionInfo.TenNV} ({SessionInfo.MaQuyen})";
+            lblWelcome.Text = $"Chào mừng, {SessionInfo.TenNV} ({SessionInfo.TenQuyen})";
 
             // Ẩn các tab không phải menu ban đầu
             tabControl.SelectedTab = tabMenu;
@@ -152,9 +152,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         {
             try
             {
-                string query = @"SELECT MaNV, TenNV, ChucVu, NgaySinh, GioiTinh, 
-                                LuongMoiGio, MaCa, MaQuyen 
-                                FROM NhanVien";
+                string query = @"SELECT * FROM NhanVien";
 
                 using (SqlConnection conn = DatabaseConnection.OpenConnection())
                 {

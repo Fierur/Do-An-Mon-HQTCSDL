@@ -1,13 +1,6 @@
 ﻿using QLQB_ChucNang_QLNhanVien_va_LichLamViec.Database;
 using QLQB_ChucNang_QLNhanVien_va_LichLamViec.Model;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
@@ -18,13 +11,16 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         {
             InitializeComponent();
             CenterToScreen();
-            
         }
 
         private void frmLogin_Load(object sender, EventArgs e)
         {
             // Focus vào textbox username
             txtUsername.Focus();
+
+            // Test data cho developer (comment dòng này khi deploy)
+             txtUsername.Text = "NV01";
+             txtPassword.Text = "nva123";
         }
 
         private void btnLogin_Click(object sender, EventArgs e)
@@ -32,7 +28,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             PerformLogin();
         }
 
-        private void txtUsername_TextChanged(object sender, KeyPressEventArgs e)
+        private void txtUsername_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == (char)Keys.Enter)
             {
@@ -41,7 +37,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             }
         }
 
-        private void txtPassword_TextChanged(object sender, KeyPressEventArgs e)
+        private void txtPassword_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == (char)Keys.Enter)
             {
@@ -72,11 +68,13 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             // Hiển thị loading
             this.Cursor = Cursors.WaitCursor;
             btnLogin.Enabled = false;
+            btnLogin.Text = "Đang đăng nhập...";
 
             try
             {
                 string errorMessage;
-                string tenNV, maQuyen;
+                string tenNV, maQuyen, tenQuyen;
+                bool isQuanLy;
 
                 // Kiểm tra đăng nhập
                 bool loginSuccess = DatabaseConnection.TestLogin(
@@ -84,7 +82,9 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                     txtPassword.Text,
                     out errorMessage,
                     out tenNV,
-                    out maQuyen
+                    out maQuyen,
+                    out tenQuyen,
+                    out isQuanLy
                 );
 
                 if (loginSuccess)
@@ -93,7 +93,27 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                     SessionInfo.MaNV = txtUsername.Text.Trim();
                     SessionInfo.TenNV = tenNV;
                     SessionInfo.MaQuyen = maQuyen;
-                    SessionInfo.IsAdmin = (maQuyen == "Q01"); // Q01 là quyền Quản lý
+                    SessionInfo.TenQuyen = tenQuyen;
+                    SessionInfo.IsAdmin = isQuanLy; // Kiểm tra theo Role_QuanLy
+
+                    // Log thông tin đăng nhập (cho debug)
+                    System.Diagnostics.Debug.WriteLine($"Đăng nhập thành công:");
+                    System.Diagnostics.Debug.WriteLine($"- MaNV: {SessionInfo.MaNV}");
+                    System.Diagnostics.Debug.WriteLine($"- TenNV: {SessionInfo.TenNV}");
+                    System.Diagnostics.Debug.WriteLine($"- MaQuyen: {SessionInfo.MaQuyen}");
+                    System.Diagnostics.Debug.WriteLine($"- TenQuyen: {SessionInfo.TenQuyen}");
+                    System.Diagnostics.Debug.WriteLine($"- IsAdmin (Role_QuanLy): {SessionInfo.IsAdmin}");
+
+                    // Hiển thị thông báo thành công
+                    MessageBox.Show(
+                        $"Đăng nhập thành công!\n\n" +
+                        $"Xin chào: {tenNV}\n" +
+                        $"Mã NV: {SessionInfo.MaNV}\n" +
+                        $"Quyền: {(isQuanLy ? "Quản lý" : maQuyen)}",
+                        "Thành công",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information
+                    );
 
                     // Đóng form login và mở form main
                     this.Hide();
@@ -106,48 +126,41 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                     MessageBox.Show(errorMessage, "Đăng nhập thất bại",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                     txtPassword.Clear();
-                    txtUsername.Focus();
+                    txtPassword.Focus();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi: " + ex.Message, "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    $"Lỗi không xác định:\n{ex.Message}\n\n" +
+                    $"Chi tiết: {ex.StackTrace}",
+                    "Lỗi",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
             finally
             {
                 this.Cursor = Cursors.Default;
                 btnLogin.Enabled = true;
+                btnLogin.Text = "ĐĂNG NHẬP";
             }
         }
 
         private void BtnExit_Click(object sender, EventArgs e)
         {
-            Application.Exit();
+            if (MessageBox.Show(
+                "Bạn có chắc muốn thoát ứng dụng?",
+                "Xác nhận",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                Application.Exit();
+            }
         }
 
         private void ChkShowPassword_CheckedChanged(object sender, EventArgs e)
         {
             txtPassword.UseSystemPasswordChar = !chkShowPassword.Checked;
-        }
-        // Replace the following two methods to use KeyPressEventArgs instead of EventArgs
-
-        private void txtUsername_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar == (char)Keys.Enter)
-            {
-                txtPassword.Focus();
-                e.Handled = true;
-            }
-        }
-
-        private void txtPassword_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar == (char)Keys.Enter)
-            {
-                PerformLogin();
-                e.Handled = true;
-            }
         }
     }
 }
