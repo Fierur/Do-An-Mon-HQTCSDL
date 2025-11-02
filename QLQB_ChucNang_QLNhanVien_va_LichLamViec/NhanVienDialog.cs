@@ -43,7 +43,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             try
             {
                 LoadGioiTinh();
-                LoadQuyen();
+                LoadChucVu();
             }
             catch (Exception ex)
             {
@@ -121,61 +121,58 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             }
         }
 
-        private void LoadQuyen()
+        private void LoadChucVu()
         {
             try
             {
+                // Lấy danh sách chức vụ từ bảng NhanVien join Quyen
                 using (SqlConnection conn = DatabaseConnection.OpenConnection())
                 {
-                    string query = "SELECT MaQuyen, TenQuyen FROM Quyen ORDER BY MaQuyen";
+                    string query = @"SELECT DISTINCT n.MaQuyen, TenQuyen, ChucVu 
+                                   FROM Quyen q 
+                                   JOIN NhanVien n ON q.MaQuyen = n.MaQuyen 
+                                   ORDER BY n.MaQuyen";
+
                     SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
                     dtQuyen = new DataTable();
                     adapter.Fill(dtQuyen);
 
-                    cboMaQuyen.DataSource = dtQuyen;
-                    cboMaQuyen.DisplayMember = "TenQuyen";
-                    cboMaQuyen.ValueMember = "MaQuyen";
+                    cboChucVu.Items.Clear();
+
+                    // Thêm các chức vụ từ database
+                    foreach (DataRow row in dtQuyen.Rows)
+                    {
+                        cboChucVu.Items.Add(new
+                        {
+                            Text = row["ChucVu"].ToString(),
+                            MaQuyen = row["MaQuyen"].ToString(),
+                            TenQuyen = row["TenQuyen"].ToString()
+                        });
+                    }
+
+                    cboChucVu.DisplayMember = "Text";
+
+                    if (cboChucVu.Items.Count > 0)
+                        cboChucVu.SelectedIndex = 0;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi load quyền: " + ex.Message, "Lỗi",
+                MessageBox.Show("Lỗi load chức vụ: " + ex.Message, "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void cboMaQuyen_SelectedIndexChanged(object sender, EventArgs e)
+        private void cboChucVu_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (cboMaQuyen.SelectedValue != null)
+            if (cboChucVu.SelectedItem != null)
             {
-                string maQuyen = cboMaQuyen.SelectedValue.ToString();
-                string chucVuMacDinh = "";
-
-                // Tự động điền chức vụ dựa trên mã quyền
-                switch (cboMaQuyen.SelectedValue.ToString())
-                {
-                    case "Q01":
-                        txtChucVu.Text = "Quản lý";
-                        break;
-                    case "Q02":
-                        txtChucVu.Text = "Phục vụ";
-                        break;
-                    case "Q03":
-                        txtChucVu.Text = "Thu ngân";
-                        break;
-                    case "Q04":
-                        txtChucVu.Text = "Bếp";
-                        break;
-                    case "Q05":
-                        txtChucVu.Text = "Bảo vệ";
-                        break;
-                }
-
-                //txtChucVu.Text = chucVuMacDinh;
+                dynamic selectedItem = cboChucVu.SelectedItem;
+                txtMaQuyen.Text = selectedItem.TenQuyen;
             }
             else
             {
-                txtChucVu.Text = "Khong co du lieu";
+                txtMaQuyen.Text = "";
             }
         }
 
@@ -206,13 +203,20 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                     if (row.Table.Columns.Contains("LuongMoiGio"))
                         nudLuongMoiGio.Value = Convert.ToDecimal(row["LuongMoiGio"]);
 
-                    // Set quyền (sẽ tự động set chức vụ qua event)
+                    // Set chức vụ dựa trên MaQuyen
                     if (row.Table.Columns.Contains("MaQuyen"))
-                        cboMaQuyen.SelectedValue = row["MaQuyen"].ToString();
-
-                    // Override chức vụ nếu có
-                    if (row.Table.Columns.Contains("ChucVu") && row["ChucVu"] != DBNull.Value)
-                        txtChucVu.Text = row["ChucVu"].ToString();
+                    {
+                        string maQuyen = row["MaQuyen"].ToString();
+                        for (int i = 0; i < cboChucVu.Items.Count; i++)
+                        {
+                            dynamic item = cboChucVu.Items[i];
+                            if (item.MaQuyen == maQuyen)
+                            {
+                                cboChucVu.SelectedIndex = i;
+                                break;
+                            }
+                        }
+                    }
                 };
             }
             catch (Exception ex)
@@ -248,18 +252,11 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                 return false;
             }
 
-            if (cboMaQuyen.SelectedValue == null)
+            if (cboChucVu.SelectedItem == null)
             {
-                MessageBox.Show("Vui lòng chọn quyền!", "Thông báo",
+                MessageBox.Show("Vui lòng chọn chức vụ!", "Thông báo",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                cboMaQuyen.Focus();
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(txtChucVu.Text))
-            {
-                MessageBox.Show("Chức vụ không được để trống!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                cboChucVu.Focus();
                 return false;
             }
 
@@ -273,12 +270,15 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
 
             MaNV = txtMaNV.Text.Trim();
             TenNV = txtTenNV.Text.Trim();
-            ChucVu = txtChucVu.Text.Trim();
             NgaySinh = dtpNgaySinh.Value;
             GioiTinh = cboGioiTinh.SelectedItem.ToString();
             MatKhau = txtMatKhau.Text.Trim();
             LuongMoiGio = nudLuongMoiGio.Value;
-            MaQuyen = cboMaQuyen.SelectedValue.ToString();
+
+            // Lấy chức vụ và mã quyền từ item được chọn
+            dynamic selectedItem = cboChucVu.SelectedItem;
+            ChucVu = selectedItem.Text;
+            MaQuyen = selectedItem.MaQuyen;
 
             this.DialogResult = DialogResult.OK;
             this.Close();

@@ -1,5 +1,4 @@
 ﻿using QLQB_ChucNang_QLNhanVien_va_LichLamViec.Database;
-using QLQB_ChucNang_QLNhanVien_va_LichLamViec.Model;
 using System;
 using System.Windows.Forms;
 

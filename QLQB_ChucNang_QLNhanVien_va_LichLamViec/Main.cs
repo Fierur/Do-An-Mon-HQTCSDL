@@ -1,5 +1,4 @@
 ﻿using QLQB_ChucNang_QLNhanVien_va_LichLamViec.Database;
-using QLQB_ChucNang_QLNhanVien_va_LichLamViec.Model;
 using System;
 using System.Data;
 using System.Data.SqlClient;
@@ -8,6 +7,7 @@ using System.Windows.Forms;
 
 namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
 {
+    
     public partial class frmMain : Form
     {
         private DataTable dtNhanVien;
@@ -319,12 +319,6 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                                     cmd.Parameters.AddWithValue("@GioiTinh", row["GioiTinh"]);
                                     cmd.Parameters.AddWithValue("@LuongMoiGio", row["LuongMoiGio"]);
                                     cmd.Parameters.AddWithValue("@MatKhau", row["MatKhau"]);
-
-                                    // MaCa = NULL (không truyền hoặc truyền NULL)
-                                    SqlParameter paramMaCa = new SqlParameter("@MaCa", SqlDbType.Char, 10);
-                                    paramMaCa.Value = DBNull.Value;
-                                    cmd.Parameters.Add(paramMaCa);
-
                                     cmd.Parameters.AddWithValue("@MaQuyen", row["MaQuyen"]);
                                     cmd.ExecuteNonQuery();
                                     successCount++;
@@ -1089,5 +1083,23 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             return btn;
         }
         #endregion
+    }
+    // Class lưu thông tin session đăng nhập
+    public static class SessionInfo
+    {
+        public static string MaNV { get; set; }
+        public static string TenNV { get; set; }
+        public static string MaQuyen { get; set; }
+        public static string TenQuyen { get; set; }
+        public static bool IsAdmin { get; set; }
+
+        public static void Clear()
+        {
+            MaNV = null;
+            TenNV = null;
+            MaQuyen = null;
+            TenQuyen = null;
+            IsAdmin = false;
+        }
     }
 }

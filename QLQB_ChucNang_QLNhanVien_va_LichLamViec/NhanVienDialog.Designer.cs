@@ -15,8 +15,8 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         private System.Windows.Forms.ComboBox cboGioiTinh;
         private System.Windows.Forms.TextBox txtMatKhau;
         private System.Windows.Forms.NumericUpDown nudLuongMoiGio;
-        private System.Windows.Forms.ComboBox cboMaQuyen;
-        private System.Windows.Forms.TextBox txtChucVu;
+        private System.Windows.Forms.ComboBox cboChucVu;
+        private System.Windows.Forms.TextBox txtMaQuyen;
         private System.Windows.Forms.Button btnOK;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Label lblMaNV;
@@ -25,8 +25,8 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         private System.Windows.Forms.Label lblGioiTinh;
         private System.Windows.Forms.Label lblMatKhau;
         private System.Windows.Forms.Label lblLuongMoiGio;
-        private System.Windows.Forms.Label lblMaQuyen;
         private System.Windows.Forms.Label lblChucVu;
+        private System.Windows.Forms.Label lblMaQuyen;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -55,8 +55,8 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             this.cboGioiTinh = new System.Windows.Forms.ComboBox();
             this.txtMatKhau = new System.Windows.Forms.TextBox();
             this.nudLuongMoiGio = new System.Windows.Forms.NumericUpDown();
-            this.cboMaQuyen = new System.Windows.Forms.ComboBox();
-            this.txtChucVu = new System.Windows.Forms.TextBox();
+            this.cboChucVu = new System.Windows.Forms.ComboBox();
+            this.txtMaQuyen = new System.Windows.Forms.TextBox();
             this.btnOK = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.lblMaNV = new System.Windows.Forms.Label();
@@ -65,8 +65,8 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             this.lblGioiTinh = new System.Windows.Forms.Label();
             this.lblMatKhau = new System.Windows.Forms.Label();
             this.lblLuongMoiGio = new System.Windows.Forms.Label();
-            this.lblMaQuyen = new System.Windows.Forms.Label();
             this.lblChucVu = new System.Windows.Forms.Label();
+            this.lblMaQuyen = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.nudLuongMoiGio)).BeginInit();
             this.SuspendLayout();
             // 
@@ -140,27 +140,26 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             0,
             0});
             // 
-            // cboMaQuyen
+            // cboChucVu
             // 
-            this.cboMaQuyen.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cboMaQuyen.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.cboMaQuyen.FormattingEnabled = true;
-            this.cboMaQuyen.Location = new System.Drawing.Point(170, 267);
-            this.cboMaQuyen.Name = "cboMaQuyen";
-            this.cboMaQuyen.Size = new System.Drawing.Size(240, 25);
-            this.cboMaQuyen.TabIndex = 13;
-            this.cboMaQuyen.SelectedIndexChanged += new System.EventHandler(this.cboMaQuyen_SelectedIndexChanged);
-            this.cboMaQuyen.Click += new System.EventHandler(this.cboMaQuyen_SelectedIndexChanged);
+            this.cboChucVu.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboChucVu.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.cboChucVu.FormattingEnabled = true;
+            this.cboChucVu.Location = new System.Drawing.Point(170, 267);
+            this.cboChucVu.Name = "cboChucVu";
+            this.cboChucVu.Size = new System.Drawing.Size(240, 25);
+            this.cboChucVu.TabIndex = 13;
+            this.cboChucVu.SelectedIndexChanged += new System.EventHandler(this.cboChucVu_SelectedIndexChanged);
             // 
-            // txtChucVu
+            // txtMaQuyen
             // 
-            this.txtChucVu.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.txtChucVu.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtChucVu.Location = new System.Drawing.Point(170, 307);
-            this.txtChucVu.Name = "txtChucVu";
-            this.txtChucVu.ReadOnly = true;
-            this.txtChucVu.Size = new System.Drawing.Size(240, 25);
-            this.txtChucVu.TabIndex = 15;
+            this.txtMaQuyen.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.txtMaQuyen.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.txtMaQuyen.Location = new System.Drawing.Point(170, 307);
+            this.txtMaQuyen.Name = "txtMaQuyen";
+            this.txtMaQuyen.ReadOnly = true;
+            this.txtMaQuyen.Size = new System.Drawing.Size(240, 25);
+            this.txtMaQuyen.TabIndex = 15;
             // 
             // btnOK
             // 
@@ -168,7 +167,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             this.btnOK.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnOK.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
             this.btnOK.ForeColor = System.Drawing.Color.White;
-            this.btnOK.Location = new System.Drawing.Point(170, 390);
+            this.btnOK.Location = new System.Drawing.Point(46, 390);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(110, 40);
             this.btnOK.TabIndex = 16;
@@ -183,7 +182,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCancel.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
             this.btnCancel.ForeColor = System.Drawing.Color.White;
-            this.btnCancel.Location = new System.Drawing.Point(300, 390);
+            this.btnCancel.Location = new System.Drawing.Point(285, 390);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(110, 40);
             this.btnCancel.TabIndex = 17;
@@ -250,32 +249,32 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             this.lblLuongMoiGio.TabIndex = 10;
             this.lblLuongMoiGio.Text = "Lương/giờ (VNĐ): *";
             // 
-            // lblMaQuyen
-            // 
-            this.lblMaQuyen.AutoSize = true;
-            this.lblMaQuyen.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.lblMaQuyen.Location = new System.Drawing.Point(30, 270);
-            this.lblMaQuyen.Name = "lblMaQuyen";
-            this.lblMaQuyen.Size = new System.Drawing.Size(63, 19);
-            this.lblMaQuyen.TabIndex = 12;
-            this.lblMaQuyen.Text = "Quyền: *";
-            // 
             // lblChucVu
             // 
             this.lblChucVu.AutoSize = true;
             this.lblChucVu.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.lblChucVu.Location = new System.Drawing.Point(30, 310);
+            this.lblChucVu.Location = new System.Drawing.Point(30, 270);
             this.lblChucVu.Name = "lblChucVu";
             this.lblChucVu.Size = new System.Drawing.Size(72, 19);
-            this.lblChucVu.TabIndex = 14;
+            this.lblChucVu.TabIndex = 12;
             this.lblChucVu.Text = "Chức vụ: *";
+            // 
+            // lblMaQuyen
+            // 
+            this.lblMaQuyen.AutoSize = true;
+            this.lblMaQuyen.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.lblMaQuyen.Location = new System.Drawing.Point(30, 310);
+            this.lblMaQuyen.Name = "lblMaQuyen";
+            this.lblMaQuyen.Size = new System.Drawing.Size(63, 19);
+            this.lblMaQuyen.TabIndex = 14;
+            this.lblMaQuyen.Text = "Quyền: *";
             // 
             // frmNhanVienDialog
             // 
             this.AcceptButton = this.btnOK;
             this.BackColor = System.Drawing.Color.White;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(450, 500);
+            this.ClientSize = new System.Drawing.Size(450, 459);
             this.Controls.Add(this.lblMaNV);
             this.Controls.Add(this.txtMaNV);
             this.Controls.Add(this.lblTenNV);
@@ -288,10 +287,10 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             this.Controls.Add(this.txtMatKhau);
             this.Controls.Add(this.lblLuongMoiGio);
             this.Controls.Add(this.nudLuongMoiGio);
-            this.Controls.Add(this.lblMaQuyen);
-            this.Controls.Add(this.cboMaQuyen);
             this.Controls.Add(this.lblChucVu);
-            this.Controls.Add(this.txtChucVu);
+            this.Controls.Add(this.cboChucVu);
+            this.Controls.Add(this.lblMaQuyen);
+            this.Controls.Add(this.txtMaQuyen);
             this.Controls.Add(this.btnOK);
             this.Controls.Add(this.btnCancel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -306,12 +305,6 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
 
         }
 
-
-
+        #endregion
     }
-
-
-
-
-    #endregion
 }
