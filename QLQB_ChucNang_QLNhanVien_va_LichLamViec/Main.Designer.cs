@@ -117,7 +117,7 @@
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlHeader.Location = new System.Drawing.Point(0, 0);
             this.pnlHeader.Name = "pnlHeader";
-            this.pnlHeader.Size = new System.Drawing.Size(780, 70);
+            this.pnlHeader.Size = new System.Drawing.Size(1144, 70);
             this.pnlHeader.TabIndex = 0;
             // 
             // btnLogout
@@ -126,7 +126,7 @@
             this.btnLogout.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnLogout.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.btnLogout.ForeColor = System.Drawing.Color.White;
-            this.btnLogout.Location = new System.Drawing.Point(638, 18);
+            this.btnLogout.Location = new System.Drawing.Point(1002, 18);
             this.btnLogout.Name = "btnLogout";
             this.btnLogout.Size = new System.Drawing.Size(130, 40);
             this.btnLogout.TabIndex = 1;
@@ -157,7 +157,7 @@
             this.tabControl.Location = new System.Drawing.Point(0, 70);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(780, 630);
+            this.tabControl.Size = new System.Drawing.Size(1144, 630);
             this.tabControl.TabIndex = 1;
             this.tabControl.SelectedIndexChanged += new System.EventHandler(this.tabControl_SelectedIndexChanged);
             // 
@@ -167,7 +167,7 @@
             this.tabMenu.Location = new System.Drawing.Point(4, 26);
             this.tabMenu.Name = "tabMenu";
             this.tabMenu.Padding = new System.Windows.Forms.Padding(3);
-            this.tabMenu.Size = new System.Drawing.Size(772, 600);
+            this.tabMenu.Size = new System.Drawing.Size(1136, 600);
             this.tabMenu.TabIndex = 0;
             this.tabMenu.Text = "Menu Chính";
             this.tabMenu.UseVisualStyleBackColor = true;
@@ -181,7 +181,7 @@
             this.pnlMenuMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlMenuMain.Location = new System.Drawing.Point(3, 3);
             this.pnlMenuMain.Name = "pnlMenuMain";
-            this.pnlMenuMain.Size = new System.Drawing.Size(766, 594);
+            this.pnlMenuMain.Size = new System.Drawing.Size(1130, 594);
             this.pnlMenuMain.TabIndex = 0;
             // 
             // btnMenuQLNV
@@ -190,7 +190,7 @@
             this.btnMenuQLNV.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnMenuQLNV.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
             this.btnMenuQLNV.ForeColor = System.Drawing.Color.White;
-            this.btnMenuQLNV.Location = new System.Drawing.Point(152, 80);
+            this.btnMenuQLNV.Location = new System.Drawing.Point(211, 49);
             this.btnMenuQLNV.Name = "btnMenuQLNV";
             this.btnMenuQLNV.Size = new System.Drawing.Size(200, 200);
             this.btnMenuQLNV.TabIndex = 0;
@@ -204,7 +204,7 @@
             this.btnMenuChamCong.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnMenuChamCong.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
             this.btnMenuChamCong.ForeColor = System.Drawing.Color.White;
-            this.btnMenuChamCong.Location = new System.Drawing.Point(420, 80);
+            this.btnMenuChamCong.Location = new System.Drawing.Point(726, 49);
             this.btnMenuChamCong.Name = "btnMenuChamCong";
             this.btnMenuChamCong.Size = new System.Drawing.Size(200, 200);
             this.btnMenuChamCong.TabIndex = 1;
@@ -218,7 +218,7 @@
             this.btnMenuTinhLuong.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnMenuTinhLuong.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
             this.btnMenuTinhLuong.ForeColor = System.Drawing.Color.White;
-            this.btnMenuTinhLuong.Location = new System.Drawing.Point(420, 329);
+            this.btnMenuTinhLuong.Location = new System.Drawing.Point(726, 298);
             this.btnMenuTinhLuong.Name = "btnMenuTinhLuong";
             this.btnMenuTinhLuong.Size = new System.Drawing.Size(200, 200);
             this.btnMenuTinhLuong.TabIndex = 2;
@@ -232,7 +232,7 @@
             this.btnMenuLichLV.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnMenuLichLV.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
             this.btnMenuLichLV.ForeColor = System.Drawing.Color.White;
-            this.btnMenuLichLV.Location = new System.Drawing.Point(152, 329);
+            this.btnMenuLichLV.Location = new System.Drawing.Point(211, 298);
             this.btnMenuLichLV.Name = "btnMenuLichLV";
             this.btnMenuLichLV.Size = new System.Drawing.Size(200, 200);
             this.btnMenuLichLV.TabIndex = 3;
@@ -281,7 +281,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(780, 700);
+            this.ClientSize = new System.Drawing.Size(1144, 700);
             this.Controls.Add(this.tabControl);
             this.Controls.Add(this.pnlHeader);
             this.Name = "frmMain";

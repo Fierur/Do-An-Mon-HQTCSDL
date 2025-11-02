@@ -89,10 +89,9 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         {
             try
             {
-                // Lấy giới tính từ SQL (DISTINCT từ bảng NhanVien)
                 using (SqlConnection conn = DatabaseConnection.OpenConnection())
                 {
-                    string query = "SELECT DISTINCT GioiTinh FROM NhanVien WHERE GioiTinh IS NOT NULL ORDER BY GioiTinh";
+                    string query = "SELECT DISTINCT GioiTinh FROM NhanVien WHERE GioiTinh IN (N'Nam', N'Nữ') ORDER BY GioiTinh;";
                     SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
                     dtGioiTinh = new DataTable();
                     adapter.Fill(dtGioiTinh);

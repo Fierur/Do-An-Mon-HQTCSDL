@@ -16,8 +16,6 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         private DataTable dtTinhLuong;
         private DataTable dtLichLamViec;
         private bool isDataChanged = false;
-
-        // Thêm button xem thông tin cá nhân
         private Button btnThongTinCaNhan;
 
         public frmMain()
@@ -29,7 +27,6 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
 
         private void InitializeThongTinCaNhanButton()
         {
-            // Thêm nút xem thông tin cá nhân ở góc phải header
             btnThongTinCaNhan = new Button();
             btnThongTinCaNhan.Text = "👤 Thông tin";
             btnThongTinCaNhan.Location = new Point(pnlHeader.Width - 280, 18);
@@ -569,6 +566,71 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
 
                     if (dgvChamCong.Columns["SoGioLam"] != null)
                         dgvChamCong.Columns["SoGioLam"].HeaderText = "Giờ Làm (8h/ngày)";
+
+                    if (SessionInfo.IsAdmin)
+                    {
+                        SqlCommand cmd = new SqlCommand("SELECT MaNV, TenNV FROM NhanVien ORDER BY MaNV", conn);
+                        SqlDataReader reader = cmd.ExecuteReader();
+                        cboNhanVienCC.Items.Clear();
+                        while (reader.Read())
+                        {
+                            cboNhanVienCC.Items.Add(new
+                            {
+                                Text = $"{reader["MaNV"]} - {reader["TenNV"]}",
+                                Value = reader["MaNV"].ToString()
+                            });
+                        }
+                        cboNhanVienCC.DisplayMember = "Text";
+                        cboNhanVienCC.ValueMember = "Value";
+                    }
+                }
+
+                isDataChanged = false;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi tải dữ liệu: " + ex.Message, "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void LoadChamCongDataFiltered(int thang, int nam)
+        {
+            try
+            {
+                string query;
+
+                if (!SessionInfo.IsAdmin)
+                {
+                    query = @"SELECT NgayDiLam, MaNV, TenNV, ChucVu, SoGioLam
+                             FROM vw_ChamCongCaNhan
+                             WHERE MONTH(NgayDiLam)=@Thang AND YEAR(NgayDiLam)=@Nam
+                             ORDER BY NgayDiLam DESC";
+                }
+                else
+                {
+                    query = @"SELECT cc.NgayDiLam, cc.MaNV, nv.TenNV, nv.ChucVu, 8 AS SoGioLam
+                             FROM ChamCong cc
+                             INNER JOIN NhanVien nv ON cc.MaNV = nv.MaNV
+                             WHERE MONTH(cc.NgayDiLam)=@Thang AND YEAR(cc.NgayDiLam)=@Nam
+                             ORDER BY cc.NgayDiLam DESC";
+                }
+
+                using (SqlConnection conn = DatabaseConnection.OpenConnection())
+                {
+                    SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
+                    adapter.SelectCommand.Parameters.AddWithValue("@Thang", thang);
+                    adapter.SelectCommand.Parameters.AddWithValue("@Nam", nam);
+
+                    dtChamCong = new DataTable();
+                    adapter.Fill(dtChamCong);
+                    dgvChamCong.DataSource = dtChamCong;
+
+                    if (dgvChamCong.Columns["NgayDiLam"] != null)
+                        dgvChamCong.Columns["NgayDiLam"].DefaultCellStyle.Format = "dd/MM/yyyy";
+
+                    if (dgvChamCong.Columns["SoGioLam"] != null)
+                        dgvChamCong.Columns["SoGioLam"].HeaderText = "Giờ Làm (8h/ngày)";
                 }
             }
             catch (Exception ex)
@@ -1037,69 +1099,4 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             IsAdmin = false;
         }
     }
-} != null)
-                        dgvChamCong.Columns["NgayDiLam"].DefaultCellStyle.Format = "dd/MM/yyyy";
-
-if (dgvChamCong.Columns["SoGioLam"] != null)
-    dgvChamCong.Columns["SoGioLam"].HeaderText = "Giờ Làm (8h/ngày)";
-
-if (SessionInfo.IsAdmin)
-{
-    SqlCommand cmd = new SqlCommand("SELECT MaNV, TenNV FROM NhanVien ORDER BY MaNV", conn);
-    SqlDataReader reader = cmd.ExecuteReader();
-    cboNhanVienCC.Items.Clear();
-    while (reader.Read())
-    {
-        cboNhanVienCC.Items.Add(new
-        {
-            Text = $"{reader["MaNV"]} - {reader["TenNV"]}",
-            Value = reader["MaNV"].ToString()
-        });
-    }
-    cboNhanVienCC.DisplayMember = "Text";
-    cboNhanVienCC.ValueMember = "Value";
 }
-                }
-
-                isDataChanged = false;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Lỗi tải dữ liệu: " + ex.Message, "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void LoadChamCongDataFiltered(int thang, int nam)
-{
-    try
-    {
-        string query;
-
-        if (!SessionInfo.IsAdmin)
-        {
-            query = @"SELECT NgayDiLam, MaNV, TenNV, ChucVu, SoGioLam
-                             FROM vw_ChamCongCaNhan
-                             WHERE MONTH(NgayDiLam)=@Thang AND YEAR(NgayDiLam)=@Nam
-                             ORDER BY NgayDiLam DESC";
-        }
-        else
-        {
-            query = @"SELECT cc.NgayDiLam, cc.MaNV, nv.TenNV, nv.ChucVu, 8 AS SoGioLam
-                             FROM ChamCong cc
-                             INNER JOIN NhanVien nv ON cc.MaNV = nv.MaNV
-                             WHERE MONTH(cc.NgayDiLam)=@Thang AND YEAR(cc.NgayDiLam)=@Nam
-                             ORDER BY cc.NgayDiLam DESC";
-        }
-
-        using (SqlConnection conn = DatabaseConnection.OpenConnection())
-        {
-            SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
-            adapter.SelectCommand.Parameters.AddWithValue("@Thang", thang);
-            adapter.SelectCommand.Parameters.AddWithValue("@Nam", nam);
-
-            dtChamCong = new DataTable();
-            adapter.Fill(dtChamCong);
-            dgvChamCong.DataSource = dtChamCong;
-
-            if (dgvChamCong.Columns["NgayDiLam"]

@@ -1,56 +1,25 @@
-﻿using QLQB_ChucNang_QLNhanVien_va_LichLamViec;
-using QLQB_ChucNang_QLNhanVien_va_LichLamViec.Database;
+﻿using QLQB_ChucNang_QLNhanVien_va_LichLamViec.Database;
 using System;
-using System.Data;
 using System.Data.SqlClient;
-using System.Drawing;
 using System.Windows.Forms;
 
 namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
 {
     public partial class frmThongTinCaNhan : Form
     {
-        private Label lblTitle;
-        private GroupBox grpThongTin;
-        private Label lblMaNV, lblTenNV, lblChucVu, lblNgaySinh;
-        private Label lblGioiTinh, lblLuongMoiGio, lblMaCa, lblQuyen;
-        private TextBox txtMaNV, txtTenNV, txtChucVu, txtNgaySinh;
-        private TextBox txtGioiTinh, txtLuongMoiGio, txtMaCa, txtQuyen;
-        private Label lblGioBD, lblGioKT;
-        private TextBox txtGioBD, txtGioKT;
-        private Button btnDong;
-
         public frmThongTinCaNhan()
         {
             InitializeComponent();
         }
 
-        
-
-        private Label CreateLabel(string text, int x, int y)
-        {
-            Label lbl = new Label();
-            lbl.Text = text;
-            lbl.Location = new Point(x, y);
-            lbl.AutoSize = true;
-            lbl.Font = new Font("Segoe UI", 10);
-            return lbl;
-        }
-
-        private TextBox CreateTextBox(int x, int y, bool readOnly)
-        {
-            TextBox txt = new TextBox();
-            txt.Location = new Point(x, y);
-            txt.Width = 200;
-            txt.Font = new Font("Segoe UI", 10);
-            txt.ReadOnly = readOnly;
-            txt.BackColor = readOnly ? Color.WhiteSmoke : Color.White;
-            return txt;
-        }
-
         private void frmThongTinCaNhan_Load(object sender, EventArgs e)
         {
             LoadThongTinCaNhan();
+        }
+
+        private void btnDong_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
 
         private void LoadThongTinCaNhan()
@@ -80,10 +49,25 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                         txtMaCa.Text = reader["MaCa"].ToString();
 
                         // Format giờ
-                        TimeSpan gioBD = (TimeSpan)reader["GioBD"];
-                        TimeSpan gioKT = (TimeSpan)reader["GioKT"];
-                        txtGioBD.Text = gioBD.ToString(@"hh\:mm");
-                        txtGioKT.Text = gioKT.ToString(@"hh\:mm");
+                        if (reader["GioBD"] != DBNull.Value)
+                        {
+                            TimeSpan gioBD = (TimeSpan)reader["GioBD"];
+                            txtGioBD.Text = gioBD.ToString(@"hh\:mm");
+                        }
+                        else
+                        {
+                            txtGioBD.Text = "";
+                        }
+
+                        if (reader["GioKT"] != DBNull.Value)
+                        {
+                            TimeSpan gioKT = (TimeSpan)reader["GioKT"];
+                            txtGioKT.Text = gioKT.ToString(@"hh\:mm");
+                        }
+                        else
+                        {
+                            txtGioKT.Text = "";
+                        }
 
                         txtQuyen.Text = reader["TenQuyen"].ToString();
 
