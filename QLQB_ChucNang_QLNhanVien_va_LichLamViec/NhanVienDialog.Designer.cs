@@ -27,6 +27,8 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         private System.Windows.Forms.Label lblLuongMoiGio;
         private System.Windows.Forms.Label lblChucVu;
         private System.Windows.Forms.Label lblMaQuyen;
+        private System.Windows.Forms.ComboBox cboTrangThai;
+        private System.Windows.Forms.Label lblTrangThai;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -167,7 +169,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             this.btnOK.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnOK.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
             this.btnOK.ForeColor = System.Drawing.Color.White;
-            this.btnOK.Location = new System.Drawing.Point(46, 390);
+            this.btnOK.Location = new System.Drawing.Point(46, 430);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(110, 40);
             this.btnOK.TabIndex = 16;
@@ -182,7 +184,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCancel.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
             this.btnCancel.ForeColor = System.Drawing.Color.White;
-            this.btnCancel.Location = new System.Drawing.Point(285, 390);
+            this.btnCancel.Location = new System.Drawing.Point(285, 430);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(110, 40);
             this.btnCancel.TabIndex = 17;
@@ -269,12 +271,43 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             this.lblMaQuyen.TabIndex = 14;
             this.lblMaQuyen.Text = "Quyền: *";
             // 
+            // lblTrangThai
+            // 
+            this.lblTrangThai = new System.Windows.Forms.Label();
+            this.lblTrangThai.AutoSize = true;
+            this.lblTrangThai.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.lblTrangThai.Location = new System.Drawing.Point(30, 350);
+            this.lblTrangThai.Name = "lblTrangThai";
+            this.lblTrangThai.Size = new System.Drawing.Size(80, 19);
+            this.lblTrangThai.TabIndex = 18;
+            this.lblTrangThai.Text = "Trạng thái: *";
+
+            // 
+            // cboTrangThai
+            // 
+            this.cboTrangThai = new System.Windows.Forms.ComboBox();
+            this.cboTrangThai.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboTrangThai.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.cboTrangThai.FormattingEnabled = true;
+            this.cboTrangThai.Location = new System.Drawing.Point(170, 347);
+            this.cboTrangThai.Name = "cboTrangThai";
+            this.cboTrangThai.Size = new System.Drawing.Size(240, 25);
+            this.cboTrangThai.TabIndex = 19;
+
+            this.cboTrangThai.Items.AddRange(new object[]
+                {
+                    "Đang làm",
+                    "Tạm nghỉ",
+                    "Nghỉ việc"
+                });
+            this.cboTrangThai.SelectedIndex = 0;
+            // 
             // frmNhanVienDialog
             // 
             this.AcceptButton = this.btnOK;
             this.BackColor = System.Drawing.Color.White;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(450, 459);
+            this.ClientSize = new System.Drawing.Size(450, 499);
             this.Controls.Add(this.lblMaNV);
             this.Controls.Add(this.txtMaNV);
             this.Controls.Add(this.lblTenNV);
@@ -293,6 +326,8 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             this.Controls.Add(this.txtMaQuyen);
             this.Controls.Add(this.btnOK);
             this.Controls.Add(this.btnCancel);
+            this.Controls.Add(this.lblTrangThai);
+            this.Controls.Add(this.cboTrangThai);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;

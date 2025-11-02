@@ -75,8 +75,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec.Database
                     errorMessage = "Tên đăng nhập hoặc mật khẩu không đúng!";
                 else
                 {
-                    //errorMessage = "Lỗi kết nối: " + ex.Message;
-                    errorMessage = "Bạn không phải là quản lý!\nVui lòng đăng nhập thông qua app nhân viên";
+                    errorMessage = "Lỗi kết nối: " + ex.Message;
                 }
                 return false;
             }

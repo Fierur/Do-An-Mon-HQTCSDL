@@ -17,6 +17,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         public string MatKhau { get; private set; }
         public decimal LuongMoiGio { get; private set; }
         public string MaQuyen { get; private set; }
+        public string TrangThai { get; private set; }
 
         private bool isEditMode = false;
         private DataTable dtQuyen;
@@ -37,6 +38,8 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                 GenerateNewMaNV();
             }
         }
+
+        
 
         private void frmNhanVienDialog_Load(object sender, EventArgs e)
         {
@@ -217,6 +220,20 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                             }
                         }
                     }
+
+                    // Set trạng thái
+                    if (row.Table.Columns.Contains("TrangThai"))
+                    {
+                        string trangThai = row["TrangThai"].ToString().Trim();
+                        for (int i = 0; i < cboTrangThai.Items.Count; i++)
+                        {
+                            if (cboTrangThai.Items[i].ToString() == trangThai)
+                            {
+                                cboTrangThai.SelectedIndex = i;
+                                break;
+                            }
+                        }
+                    }
                 };
             }
             catch (Exception ex)
@@ -274,6 +291,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             GioiTinh = cboGioiTinh.SelectedItem.ToString();
             MatKhau = txtMatKhau.Text.Trim();
             LuongMoiGio = nudLuongMoiGio.Value;
+            TrangThai = cboTrangThai.SelectedItem.ToString();
 
             // Lấy chức vụ và mã quyền từ item được chọn
             dynamic selectedItem = cboChucVu.SelectedItem;

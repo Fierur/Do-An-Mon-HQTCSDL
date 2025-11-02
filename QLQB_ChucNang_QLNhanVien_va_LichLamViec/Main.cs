@@ -3,6 +3,7 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
@@ -39,8 +40,16 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             // Nếu không phải admin (Q01), ẩn một số chức năng
             if (!SessionInfo.IsAdmin)
             {
-                btnMenuQLNV.Enabled = false;
-                btnMenuTinhLuong.Enabled = false;
+                btnMenuQLNV.Visible = false;
+                btnMenuTinhLuong.Visible = false;
+                btnMenuLichLV.Visible = false;
+
+                tabControl.SelectedTab = tabChamCong;
+
+                tabControl.TabPages.Remove(tabMenu);
+                tabControl.TabPages.Remove(tabQuanLyNV);
+                tabControl.TabPages.Remove(tabTinhLuong);
+                tabControl.TabPages.Remove(tabLichLamViec);
             }
         }
 
@@ -153,8 +162,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             try
             {
                 string query = @"SELECT MaNV, TenNV, ChucVu, NgaySinh, GioiTinh, MatKhau, 
-                                LuongMoiGio, MaQuyen FROM NhanVien ORDER BY MaNV";
-
+                                LuongMoiGio, MaQuyen, TrangThai FROM NhanVien ORDER BY MaNV";
                 using (SqlConnection conn = DatabaseConnection.OpenConnection())
                 {
                     SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
@@ -183,33 +191,60 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
 
         private void btnQLNV_Them_Click(object sender, EventArgs e)
         {
+            string maNV;
+
+            // Nếu là nhân viên thường, tự động lấy MaNV của họ
             if (!SessionInfo.IsAdmin)
             {
-                MessageBox.Show("Bạn không có quyền thêm nhân viên!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                maNV = SessionInfo.MaNV;
+            }
+            else
+            {
+                // Quản lý phải chọn nhân viên
+                if (cboNhanVienCC.SelectedItem == null)
+                {
+                    MessageBox.Show("Vui lòng chọn nhân viên!", "Thông báo",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                dynamic selectedItem = cboNhanVienCC.SelectedItem;
+                maNV = selectedItem.Value;
             }
 
-            using (frmNhanVienDialog dialog = new frmNhanVienDialog(false))
+            try
             {
-                if (dialog.ShowDialog() == DialogResult.OK)
+                DateTime ngay = dtpChamCong.Value.Date;
+
+                using (SqlConnection conn = DatabaseConnection.OpenConnection())
                 {
-                    DataRow newRow = dtNhanVien.NewRow();
-                    newRow["MaNV"] = dialog.MaNV;
-                    newRow["TenNV"] = dialog.TenNV;
-                    newRow["ChucVu"] = dialog.ChucVu;
-                    newRow["NgaySinh"] = dialog.NgaySinh;
-                    newRow["GioiTinh"] = dialog.GioiTinh;
-                    newRow["MatKhau"] = dialog.MatKhau;
-                    newRow["LuongMoiGio"] = dialog.LuongMoiGio;
-                    newRow["MaQuyen"] = dialog.MaQuyen;
+                    SqlCommand checkCmd = new SqlCommand(
+                        "SELECT COUNT(*) FROM ChamCong WHERE MaNV = @MaNV AND NgayDiLam = @Ngay", conn);
+                    checkCmd.Parameters.AddWithValue("@MaNV", maNV);
+                    checkCmd.Parameters.AddWithValue("@Ngay", ngay);
 
-                    dtNhanVien.Rows.Add(newRow);
-                    isDataChanged = true;
+                    int count = (int)checkCmd.ExecuteScalar();
+                    if (count > 0)
+                    {
+                        MessageBox.Show("Nhân viên đã chấm công ngày này!", "Thông báo",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
 
-                    MessageBox.Show("Đã thêm nhân viên vào danh sách!\nNhấn nút 'Lưu' để lưu vào database.",
-                        "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    SqlCommand cmd = new SqlCommand(
+                        "INSERT INTO ChamCong (NgayDiLam, MaNV) VALUES (@Ngay, @MaNV)", conn);
+                    cmd.Parameters.AddWithValue("@Ngay", ngay);
+                    cmd.Parameters.AddWithValue("@MaNV", maNV);
+                    cmd.ExecuteNonQuery();
+
+                    MessageBox.Show("Chấm công thành công!", "Thông báo",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LoadChamCongData();
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi: " + ex.Message, "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -268,6 +303,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                         selectedRow["MatKhau"] = dialog.MatKhau;
                         selectedRow["LuongMoiGio"] = dialog.LuongMoiGio;
                         selectedRow["MaQuyen"] = dialog.MaQuyen;
+                        selectedRow["TrangThai"] = dialog.TrangThai;
 
                         isDataChanged = true;
                         dgvNhanVien.Refresh();
@@ -320,7 +356,24 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                                     cmd.Parameters.AddWithValue("@LuongMoiGio", row["LuongMoiGio"]);
                                     cmd.Parameters.AddWithValue("@MatKhau", row["MatKhau"]);
                                     cmd.Parameters.AddWithValue("@MaQuyen", row["MaQuyen"]);
+                                    cmd.Parameters.AddWithValue("@TrangThai", row["TrangThai"]);
                                     cmd.ExecuteNonQuery();
+
+                                    try
+                                    {
+                                        string maNV = row["MaNV"].ToString();
+                                        SqlCommand cmdCreateAccount = new SqlCommand("sp_TaoTaiKhoanNhanVien", conn);
+                                        cmdCreateAccount.CommandType = CommandType.StoredProcedure;
+                                        cmdCreateAccount.Parameters.AddWithValue("@MaNV", maNV);
+                                        cmdCreateAccount.ExecuteNonQuery();
+
+                                        System.Diagnostics.Debug.WriteLine($"Đã tạo tài khoản cho nhân viên {maNV}");
+                                    }
+                                    catch (SqlException sqlEx)
+                                    {
+                                        // Log lỗi nhưng không dừng tiến trình
+                                        System.Diagnostics.Debug.WriteLine($"Lỗi tạo tài khoản: {sqlEx.Message}");
+                                    }
                                     successCount++;
                                 }
                                 else if (row.RowState == DataRowState.Modified)
@@ -328,7 +381,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                                     string updateQuery = @"UPDATE NhanVien SET 
                                         TenNV = @TenNV, ChucVu = @ChucVu, NgaySinh = @NgaySinh,
                                         GioiTinh = @GioiTinh, MatKhau = @MatKhau, 
-                                        LuongMoiGio = @LuongMoiGio, MaQuyen = @MaQuyen
+                                        LuongMoiGio = @LuongMoiGio, MaQuyen = @MaQuyen, TrangThai = @TrangThai
                                         WHERE MaNV = @MaNV";
 
                                     SqlCommand cmd = new SqlCommand(updateQuery, conn);
@@ -340,6 +393,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                                     cmd.Parameters.AddWithValue("@MatKhau", row["MatKhau"]);
                                     cmd.Parameters.AddWithValue("@LuongMoiGio", row["LuongMoiGio"]);
                                     cmd.Parameters.AddWithValue("@MaQuyen", row["MaQuyen"]);
+                                    cmd.Parameters.AddWithValue("@TrangThai", row["TrangThai"]);
                                     cmd.ExecuteNonQuery();
                                     successCount++;
                                 }
@@ -434,10 +488,62 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                 lblNhanVien, cboNhanVienCC, lblNgay, dtpChamCong
             });
 
+            
             pnlChamCong = new Panel();
             pnlChamCong.Dock = DockStyle.Bottom;
             pnlChamCong.Height = 60;
             pnlChamCong.BackColor = Color.WhiteSmoke;
+
+            // Bộ lọc cho quản lý
+            Label lblLocThang = new Label();
+            lblLocThang.Text = "Lọc tháng:";
+            lblLocThang.Location = new Point(650, 25);
+            lblLocThang.AutoSize = true;
+
+            NumericUpDown nudLocThang = new NumericUpDown();
+            nudLocThang.Name = "nudLocThang";
+            nudLocThang.Location = new Point(730, 22);
+            nudLocThang.Width = 60;
+            nudLocThang.Minimum = 1;
+            nudLocThang.Maximum = 12;
+            nudLocThang.Value = DateTime.Now.Month;
+
+            Label lblLocNam = new Label();
+            lblLocNam.Text = "Năm:";
+            lblLocNam.Location = new Point(810, 25);
+            lblLocNam.AutoSize = true;
+
+            NumericUpDown nudLocNam = new NumericUpDown();
+            nudLocNam.Name = "nudLocNam";
+            nudLocNam.Location = new Point(860, 22);
+            nudLocNam.Width = 80;
+            nudLocNam.Minimum = 2020;
+            nudLocNam.Maximum = 2100;
+            nudLocNam.Value = DateTime.Now.Year;
+
+            Button btnLocChamCong = new Button();
+            btnLocChamCong.Text = "Lọc";
+            btnLocChamCong.Location = new Point(960, 20);
+            btnLocChamCong.Size = new Size(80, 27);
+            btnLocChamCong.BackColor = Color.FromArgb(52, 152, 219);
+            btnLocChamCong.ForeColor = Color.White;
+            btnLocChamCong.FlatStyle = FlatStyle.Flat;
+            btnLocChamCong.Click += (s, ev) => { LoadChamCongDataFiltered((int)nudLocThang.Value, (int)nudLocNam.Value); };
+
+            Button btnHuyLoc = new Button();
+            btnHuyLoc.Text = "Hủy lọc";
+            btnHuyLoc.Location = new Point(1050, 20);
+            btnHuyLoc.Size = new Size(80, 27);
+            btnHuyLoc.BackColor = Color.FromArgb(189, 195, 199);
+            btnHuyLoc.ForeColor = Color.White;
+            btnHuyLoc.FlatStyle = FlatStyle.Flat;
+            btnHuyLoc.Click += (s, ev) => LoadChamCongData();
+
+            // Chỉ hiển thị bộ lọc cho quản lý
+            if (SessionInfo.IsAdmin)
+            {
+                pnlCCInput.Controls.AddRange(new Control[] { lblLocThang, nudLocThang, lblLocNam, nudLocNam, btnLocChamCong, btnHuyLoc });
+            }
 
             btnCC_Them = CreateButton("Chấm công", 20);
             btnCC_Xoa = CreateButton("Xóa", 140);
@@ -468,16 +574,49 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             btnCC_Save.Click += btnCC_Save_Click;
             btnCC_Cancel.Click += btnCC_Cancel_Click;
             btnCC_BackMenu.Click += (s, ev) => tabControl.SelectedTab = tabMenu;
+
+            if (!SessionInfo.IsAdmin)
+            {
+                // Chỉ hiển thị bộ lọc cho nhân viên thường, ẩn phần chọn nhân viên
+                pnlCCInput.Controls.AddRange(new Control[] {lblLocThang, nudLocThang, lblLocNam, nudLocNam,btnLocChamCong, btnHuyLoc});
+
+                // Ẩn phần chọn nhân viên
+                lblNhanVien.Visible = false;
+                cboNhanVienCC.Visible = false;
+            }
+            else
+            {
+                // Quản lý thì hiển thị đầy đủ
+                pnlCCInput.Controls.AddRange(new Control[] {lblNhanVien, cboNhanVienCC, lblNgay, dtpChamCong,lblLocThang, nudLocThang, lblLocNam, nudLocNam,
+                    btnLocChamCong, btnHuyLoc
+                });
+            }
         }
 
         private void LoadChamCongData()
         {
             try
             {
-                string query = @"SELECT cc.NgayDiLam, cc.MaNV, nv.TenNV, nv.ChucVu
-                                FROM ChamCong cc
-                                INNER JOIN NhanVien nv ON cc.MaNV = nv.MaNV
-                                ORDER BY cc.NgayDiLam DESC";
+                string query;
+
+                // Nếu là nhân viên thường, dùng VIEW
+                if (!SessionInfo.IsAdmin)
+                {
+                    query = @"SELECT NgayDiLam, MaNV, TenNV, ChucVu, SoGioLam
+                     FROM vw_ChamCongCaNhan
+                     ORDER BY NgayDiLam DESC";
+                }
+                else
+                {
+                    // Quản lý xem tất cả
+                    query = @"SELECT cc.NgayDiLam, cc.MaNV, nv.TenNV, nv.ChucVu,
+                     llv.GioBD, llv.GioKT,
+                     DATEDIFF(HOUR, llv.GioBD, llv.GioKT) AS SoGioLam
+                     FROM ChamCong cc
+                     INNER JOIN NhanVien nv ON cc.MaNV = nv.MaNV
+                     INNER JOIN LichLamViec llv ON nv.MaCa = llv.MaCa
+                     ORDER BY cc.NgayDiLam DESC";
+                }
 
                 using (SqlConnection conn = DatabaseConnection.OpenConnection())
                 {
@@ -486,19 +625,40 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                     adapter.Fill(dtChamCong);
                     dgvChamCong.DataSource = dtChamCong;
 
-                    SqlCommand cmd = new SqlCommand("SELECT MaNV, TenNV FROM NhanVien", conn);
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    cboNhanVienCC.Items.Clear();
-                    while (reader.Read())
+                    // Format cột ngày
+                    if (dgvChamCong.Columns["NgayDiLam"] != null)
+                        dgvChamCong.Columns["NgayDiLam"].DefaultCellStyle.Format = "dd/MM/yyyy";
+
+                    // Load combobox nhân viên (chỉ cho admin)
+                    if (SessionInfo.IsAdmin)
                     {
-                        cboNhanVienCC.Items.Add(new
+                        SqlCommand cmd = new SqlCommand("SELECT MaNV, TenNV FROM NhanVien ORDER BY MaNV", conn);
+                        SqlDataReader reader = cmd.ExecuteReader();
+                        cboNhanVienCC.Items.Clear();
+                        while (reader.Read())
                         {
-                            Text = $"{reader["MaNV"]} - {reader["TenNV"]}",
-                            Value = reader["MaNV"].ToString()
-                        });
+                            cboNhanVienCC.Items.Add(new
+                            {
+                                Text = $"{reader["MaNV"]} - {reader["TenNV"]}",
+                                Value = reader["MaNV"].ToString()
+                            });
+                        }
+                        cboNhanVienCC.DisplayMember = "Text";
+                        cboNhanVienCC.ValueMember = "Value";
                     }
-                    cboNhanVienCC.DisplayMember = "Text";
-                    cboNhanVienCC.ValueMember = "Value";
+                    else
+                    {
+                        // Nhân viên thường: ẩn phần chọn nhân viên
+                        cboNhanVienCC.Visible = false;
+                        foreach (Control ctrl in cboNhanVienCC.Parent.Controls)
+                        {
+                            if (ctrl is Label && ctrl.Text == "Nhân viên:")
+                            {
+                                ctrl.Visible = false;
+                                break;
+                            }
+                        }
+                    }
                 }
 
                 isDataChanged = false;
@@ -510,53 +670,55 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             }
         }
 
-        private void btnCC_Them_Click(object sender, EventArgs e)
-        {
-            if (cboNhanVienCC.SelectedItem == null)
-            {
-                MessageBox.Show("Vui lòng chọn nhân viên!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
 
+        private void LoadChamCongDataFiltered(int thang, int nam)
+        {
             try
             {
-                dynamic selectedItem = cboNhanVienCC.SelectedItem;
-                string maNV = selectedItem.Value;
-                DateTime ngay = dtpChamCong.Value.Date;
+                string query;
+
+                // Nếu là nhân viên thường, dùng VIEW với filter
+                if (!SessionInfo.IsAdmin)
+                {
+                    query = @"SELECT NgayDiLam, MaNV, TenNV, ChucVu, SoGioLam
+                     FROM vw_ChamCongCaNhan
+                     WHERE MONTH(NgayDiLam) = @Thang AND YEAR(NgayDiLam) = @Nam
+                     ORDER BY NgayDiLam DESC";
+                }
+                else
+                {
+                    // Quản lý xem tất cả với filter
+                    query = @"SELECT cc.NgayDiLam, cc.MaNV, nv.TenNV, nv.ChucVu,
+                     llv.GioBD, llv.GioKT,
+                     DATEDIFF(HOUR, llv.GioBD, llv.GioKT) AS SoGioLam
+                     FROM ChamCong cc
+                     INNER JOIN NhanVien nv ON cc.MaNV = nv.MaNV
+                     INNER JOIN LichLamViec llv ON nv.MaCa = llv.MaCa
+                     WHERE MONTH(cc.NgayDiLam) = @Thang AND YEAR(cc.NgayDiLam) = @Nam
+                     ORDER BY cc.NgayDiLam DESC";
+                }
 
                 using (SqlConnection conn = DatabaseConnection.OpenConnection())
                 {
-                    SqlCommand checkCmd = new SqlCommand(
-                        "SELECT COUNT(*) FROM ChamCong WHERE MaNV = @MaNV AND NgayDiLam = @Ngay", conn);
-                    checkCmd.Parameters.AddWithValue("@MaNV", maNV);
-                    checkCmd.Parameters.AddWithValue("@Ngay", ngay);
+                    SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
+                    adapter.SelectCommand.Parameters.AddWithValue("@Thang", thang);
+                    adapter.SelectCommand.Parameters.AddWithValue("@Nam", nam);
 
-                    int count = (int)checkCmd.ExecuteScalar();
-                    if (count > 0)
-                    {
-                        MessageBox.Show("Nhân viên đã chấm công ngày này!", "Thông báo",
-                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
-                    }
+                    dtChamCong = new DataTable();
+                    adapter.Fill(dtChamCong);
+                    dgvChamCong.DataSource = dtChamCong;
 
-                    SqlCommand cmd = new SqlCommand(
-                        "INSERT INTO ChamCong (NgayDiLam, MaNV) VALUES (@Ngay, @MaNV)", conn);
-                    cmd.Parameters.AddWithValue("@Ngay", ngay);
-                    cmd.Parameters.AddWithValue("@MaNV", maNV);
-                    cmd.ExecuteNonQuery();
-
-                    MessageBox.Show("Chấm công thành công!", "Thông báo",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LoadChamCongData();
+                    if (dgvChamCong.Columns["NgayDiLam"] != null)
+                        dgvChamCong.Columns["NgayDiLam"].DefaultCellStyle.Format = "dd/MM/yyyy";
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi: " + ex.Message, "Lỗi",
+                MessageBox.Show("Lỗi lọc dữ liệu: " + ex.Message, "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
 
         private void btnCC_Xoa_Click(object sender, EventArgs e)
         {
@@ -907,13 +1069,25 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             pnlLichLV.Dock = DockStyle.Bottom;
             pnlLichLV.Height = 60;
             pnlLichLV.BackColor = Color.WhiteSmoke;
+            Button btnXemCaLam = CreateButton("📋 Xem Ca Làm", 20);
+            btnXemCaLam.Width = 130;
+            btnXemCaLam.Click += btnXemCaLam_Click;
 
+            // Điều chỉnh vị trí các nút khác
+            btnLLV_Them.Location = new Point(160, 10);
+            btnLLV_Xoa.Location = new Point(280, 10);
+            btnLLV_Sua.Location = new Point(400, 10);
+            btnLLV_Save.Location = new Point(520, 10);
+            btnLLV_Cancel.Location = new Point(640, 10);
+
+            pnlLichLV.Controls.Add(btnXemCaLam);
             btnLLV_Them = CreateButton("Thêm", 20);
             btnLLV_Xoa = CreateButton("Xóa", 140);
             btnLLV_Sua = CreateButton("Sửa", 260);
             btnLLV_Save = CreateButton("Lưu", 380);
             btnLLV_Cancel = CreateButton("Hủy", 500);
             btnLLV_BackMenu = CreateButton("← Menu", 1050);
+
 
             pnlLichLV.Controls.AddRange(new Control[] {
                 btnLLV_Them, btnLLV_Xoa, btnLLV_Sua,
@@ -955,6 +1129,13 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                     dtLichLamViec = new DataTable();
                     adapter.Fill(dtLichLamViec);
                     dgvLichLamViec.DataSource = dtLichLamViec;
+
+                    if (dgvLichLamViec.Columns["GioBD"] != null)
+                        dgvLichLamViec.Columns["GioBD"].HeaderText = "Giờ Bắt Đầu";
+
+                    if (dgvLichLamViec.Columns["GioKT"] != null)
+                        dgvLichLamViec.Columns["GioKT"].HeaderText = "Giờ Kết Thúc";
+
                 }
 
                 isDataChanged = false;
@@ -964,6 +1145,12 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                 MessageBox.Show("Lỗi tải dữ liệu: " + ex.Message, "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void btnXemCaLam_Click(object sender, EventArgs e)
+        {
+            frmXemCaLam formCaLam = new frmXemCaLam();
+            formCaLam.ShowDialog();
         }
 
         private void btnLLV_Them_Click(object sender, EventArgs e)
