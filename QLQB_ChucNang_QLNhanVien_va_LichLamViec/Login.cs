@@ -95,13 +95,6 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                     SessionInfo.TenQuyen = tenQuyen;
                     SessionInfo.IsAdmin = isQuanLy; // Kiểm tra theo Role_QuanLy
 
-                    //// Log thông tin đăng nhập (cho debug)
-                    //System.Diagnostics.Debug.WriteLine($"Đăng nhập thành công:");
-                    //System.Diagnostics.Debug.WriteLine($"- MaNV: {SessionInfo.MaNV}");
-                    //System.Diagnostics.Debug.WriteLine($"- TenNV: {SessionInfo.TenNV}");
-                    //System.Diagnostics.Debug.WriteLine($"- MaQuyen: {SessionInfo.MaQuyen}");
-                    //System.Diagnostics.Debug.WriteLine($"- TenQuyen: {SessionInfo.TenQuyen}");
-                    //System.Diagnostics.Debug.WriteLine($"- IsAdmin (Role_QuanLy): {SessionInfo.IsAdmin}");
 
                     // Hiển thị thông báo thành công
                     MessageBox.Show(

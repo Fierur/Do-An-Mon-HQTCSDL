@@ -245,7 +245,7 @@
             this.tabQuanLyNV.Location = new System.Drawing.Point(4, 26);
             this.tabQuanLyNV.Name = "tabQuanLyNV";
             this.tabQuanLyNV.Padding = new System.Windows.Forms.Padding(3);
-            this.tabQuanLyNV.Size = new System.Drawing.Size(772, 600);
+            this.tabQuanLyNV.Size = new System.Drawing.Size(1136, 600);
             this.tabQuanLyNV.TabIndex = 1;
             this.tabQuanLyNV.Text = "Quản Lý Nhân Viên";
             this.tabQuanLyNV.UseVisualStyleBackColor = true;
@@ -254,7 +254,7 @@
             // 
             this.tabChamCong.Location = new System.Drawing.Point(4, 26);
             this.tabChamCong.Name = "tabChamCong";
-            this.tabChamCong.Size = new System.Drawing.Size(772, 600);
+            this.tabChamCong.Size = new System.Drawing.Size(1136, 600);
             this.tabChamCong.TabIndex = 2;
             this.tabChamCong.Text = "Chấm Công";
             this.tabChamCong.UseVisualStyleBackColor = true;
@@ -263,7 +263,7 @@
             // 
             this.tabTinhLuong.Location = new System.Drawing.Point(4, 26);
             this.tabTinhLuong.Name = "tabTinhLuong";
-            this.tabTinhLuong.Size = new System.Drawing.Size(772, 600);
+            this.tabTinhLuong.Size = new System.Drawing.Size(1136, 600);
             this.tabTinhLuong.TabIndex = 3;
             this.tabTinhLuong.Text = "Tính Lương";
             this.tabTinhLuong.UseVisualStyleBackColor = true;
@@ -272,7 +272,7 @@
             // 
             this.tabLichLamViec.Location = new System.Drawing.Point(4, 26);
             this.tabLichLamViec.Name = "tabLichLamViec";
-            this.tabLichLamViec.Size = new System.Drawing.Size(772, 600);
+            this.tabLichLamViec.Size = new System.Drawing.Size(1136, 600);
             this.tabLichLamViec.TabIndex = 4;
             this.tabLichLamViec.Text = "Lịch Làm Việc";
             this.tabLichLamViec.UseVisualStyleBackColor = true;

@@ -1,5 +1,4 @@
-﻿using QLQB_ChucNang_QLNhanVien_va_LichLamViec;
-using QLQB_ChucNang_QLNhanVien_va_LichLamViec.Database;
+﻿using QLQB_ChucNang_QLNhanVien_va_LichLamViec.Database;
 using System;
 using System.Data;
 using System.Data.SqlClient;
@@ -15,8 +14,25 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         private DataTable dtChamCong;
         private DataTable dtTinhLuong;
         private DataTable dtLichLamViec;
+        private DataTable dtQuyen;
+        private DataTable dtGioiTinh;
         private bool isDataChanged = false;
         private Button btnThongTinCaNhan;
+
+        // Controls cho tab Quản lý nhân viên (gộp dialog vào)
+        private Panel pnlNVInput;
+        private TextBox txtMaNV, txtTenNV, txtMatKhau;
+        private DateTimePicker dtpNgaySinh;
+        private ComboBox cboGioiTinh, cboChucVu, cboTrangThai;
+        private NumericUpDown nudLuongMoiGio;
+        private TextBox txtMaQuyen;
+
+        // Controls cho tab Lịch làm việc (gộp form CaLam)
+        private DataGridView dgvCaLam, dgvNhanVienCa;
+        private DateTimePicker dtpLocNgay;
+        private NumericUpDown nudLocThang, nudLocNam;
+        private Button btnLocNgay, btnLocThang, btnHuyLocCa;
+        private Panel pnlThongKeCa;
 
         public frmMain()
         {
@@ -42,8 +58,44 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
 
         private void btnThongTinCaNhan_Click(object sender, EventArgs e)
         {
-            frmThongTinCaNhan formThongTin = new frmThongTinCaNhan();
-            formThongTin.ShowDialog();
+            ShowThongTinCaNhan();
+        }
+
+        private void ShowThongTinCaNhan()
+        {
+            try
+            {
+                string query = "SELECT * FROM vw_ThongTinCaNhan";
+                using (SqlConnection conn = DatabaseConnection.OpenConnection())
+                {
+                    SqlCommand cmd = new SqlCommand(query, conn);
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    if (reader.Read())
+                    {
+                        string info = $"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                                    $"           THÔNG TIN CÁ NHÂN\n" +
+                                    $"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" +
+                                    $"  👤 Mã NV:            {reader["MaNV"]}\n" +
+                                    $"  📝 Tên:               {reader["TenNV"]}\n" +
+                                    $"  💼 Chức vụ:          {reader["ChucVu"]}\n" +
+                                    $"  🎂 Ngày sinh:      {Convert.ToDateTime(reader["NgaySinh"]):dd/MM/yyyy}\n" +
+                                    $"  ⚧  Giới tính:         {reader["GioiTinh"]}\n" +
+                                    $"  💰 Lương/giờ:       {Convert.ToDecimal(reader["LuongMoiGio"]):N0} VNĐ\n" +
+                                    $"  🔑 Quyền:            {reader["TenQuyen"]}\n\n" +
+                                    $"  📅 Ca làm việc:    {reader["MaCa"]}\n" +
+                                    $"  ⏰ Giờ:                 {(reader["GioBD"] != DBNull.Value ? ((TimeSpan)reader["GioBD"]).ToString(@"hh\:mm") : "")} - " +
+                                    $"{(reader["GioKT"] != DBNull.Value ? ((TimeSpan)reader["GioKT"]).ToString(@"hh\:mm") : "")}\n" +
+                                    $"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+
+                        MessageBox.Show(info, "Thông tin cá nhân", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void frmMain_Load(object sender, EventArgs e)
@@ -121,26 +173,88 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         }
         #endregion
 
-        #region Quản Lý Nhân Viên
+        #region Quản Lý Nhân Viên (Gộp Dialog)
         private void InitializeQLNVTab()
         {
-            pnlQLNV = new Panel();
-            pnlQLNV.Dock = DockStyle.Bottom;
-            pnlQLNV.Height = 60;
-            pnlQLNV.BackColor = Color.WhiteSmoke;
+            // Panel Input Form
+            pnlNVInput = new Panel();
+            pnlNVInput.Dock = DockStyle.Top;
+            pnlNVInput.Height = 280;
+            pnlNVInput.BackColor = Color.FromArgb(245, 245, 245);
+            pnlNVInput.Padding = new Padding(10);
 
-            btnQLNV_Them = CreateButton("Thêm", 20);
-            btnQLNV_Xoa = CreateButton("Xóa", 140);
-            btnQLNV_Sua = CreateButton("Sửa", 260);
-            btnQLNV_Save = CreateButton("Lưu", 380);
-            btnQLNV_Cancel = CreateButton("Hủy", 500);
-            btnQLNV_BackMenu = CreateButton("← Menu", 620);
+            // Row 1
+            Label lblMaNV = new Label { Text = "Mã NV:", Location = new Point(20, 15), AutoSize = true };
+            txtMaNV = new TextBox { Location = new Point(150, 12), Width = 150, ReadOnly = true, BackColor = Color.LightGray };
 
-            pnlQLNV.Controls.AddRange(new Control[] {
-                btnQLNV_Them, btnQLNV_Xoa, btnQLNV_Sua,
-                btnQLNV_Save, btnQLNV_Cancel, btnQLNV_BackMenu
+            Label lblTenNV = new Label { Text = "Tên NV: *", Location = new Point(320, 15), AutoSize = true };
+            txtTenNV = new TextBox { Location = new Point(420, 12), Width = 200 };
+
+            Label lblChucVu = new Label { Text = "Chức vụ: *", Location = new Point(640, 15), AutoSize = true };
+            cboChucVu = new ComboBox { Location = new Point(740, 12), Width = 180, DropDownStyle = ComboBoxStyle.DropDownList };
+            cboChucVu.SelectedIndexChanged += (s, ev) =>
+            {
+                if (cboChucVu.SelectedItem != null)
+                {
+                    dynamic item = cboChucVu.SelectedItem;
+                    txtMaQuyen.Text = item.TenQuyen;
+                }
+            };
+
+            // Row 2
+            Label lblNgaySinh = new Label { Text = "Ngày sinh: *", Location = new Point(20, 55), AutoSize = true };
+            dtpNgaySinh = new DateTimePicker { Location = new Point(150, 52), Width = 150, Format = DateTimePickerFormat.Short, MaxDate = DateTime.Now.AddYears(-18) };
+
+            Label lblGioiTinh = new Label { Text = "Giới tính: *", Location = new Point(320, 55), AutoSize = true };
+            cboGioiTinh = new ComboBox { Location = new Point(420, 52), Width = 100, DropDownStyle = ComboBoxStyle.DropDownList };
+            cboGioiTinh.Items.AddRange(new object[] { "Nam", "Nữ" });
+            cboGioiTinh.SelectedIndex = 0;
+
+            Label lblTrangThai = new Label { Text = "Trạng thái: *", Location = new Point(540, 55), AutoSize = true };
+            cboTrangThai = new ComboBox { Location = new Point(640, 52), Width = 150, DropDownStyle = ComboBoxStyle.DropDownList };
+            cboTrangThai.Items.AddRange(new object[] { "Đang làm", "Tạm nghỉ", "Nghỉ việc" });
+            cboTrangThai.SelectedIndex = 0;
+
+            // Row 3
+            Label lblMatKhau = new Label { Text = "Mật khẩu: *", Location = new Point(20, 95), AutoSize = true };
+            txtMatKhau = new TextBox { Location = new Point(150, 92), Width = 200 };
+
+            Label lblLuong = new Label { Text = "Lương/giờ: *", Location = new Point(370, 95), AutoSize = true };
+            nudLuongMoiGio = new NumericUpDown
+            {
+                Location = new Point(470, 92),
+                Width = 150,
+                Minimum = 10000,
+                Maximum = 1000000,
+                Value = 50000,
+                Increment = 5000,
+                ThousandsSeparator = true
+            };
+
+            Label lblQuyen = new Label { Text = "Quyền:", Location = new Point(640, 95), AutoSize = true };
+            txtMaQuyen = new TextBox { Location = new Point(740, 92), Width = 180, ReadOnly = true, BackColor = Color.WhiteSmoke };
+
+            // Buttons
+            Button btnGenMaNV = new Button
+            {
+                Text = "🔄 Tạo mã",
+                Location = new Point(20, 140),
+                Size = new Size(100, 35),
+                BackColor = Color.FromArgb(155, 89, 182),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
+            };
+            btnGenMaNV.Click += (s, ev) => GenerateNewMaNV();
+
+            pnlNVInput.Controls.AddRange(new Control[] {
+                lblMaNV, txtMaNV, lblTenNV, txtTenNV, lblChucVu, cboChucVu,
+                lblNgaySinh, dtpNgaySinh, lblGioiTinh, cboGioiTinh, lblTrangThai, cboTrangThai,
+                lblMatKhau, txtMatKhau, lblLuong, nudLuongMoiGio, lblQuyen, txtMaQuyen,
+                btnGenMaNV
             });
 
+            // DataGridView
             dgvNhanVien = new DataGridView();
             dgvNhanVien.Dock = DockStyle.Fill;
             dgvNhanVien.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
@@ -148,8 +262,30 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             dgvNhanVien.MultiSelect = false;
             dgvNhanVien.ReadOnly = true;
             dgvNhanVien.AllowUserToAddRows = false;
+            dgvNhanVien.RowTemplate.Height = 30;
+            dgvNhanVien.SelectionChanged += dgvNhanVien_SelectionChanged;
+            dgvNhanVien.CellFormatting += dgvNhanVien_CellFormatting;
+
+            // Panel Bottom
+            pnlQLNV = new Panel();
+            pnlQLNV.Dock = DockStyle.Bottom;
+            pnlQLNV.Height = 60;
+            pnlQLNV.BackColor = Color.WhiteSmoke;
+
+            btnQLNV_Them = CreateButton("➕ Thêm", 20, Color.FromArgb(46, 204, 113));
+            btnQLNV_Sua = CreateButton("✏️ Sửa", 140, Color.FromArgb(241, 196, 15));
+            btnQLNV_Xoa = CreateButton("🗑️ Xóa", 260, Color.FromArgb(231, 76, 60));
+            btnQLNV_Save = CreateButton("💾 Lưu", 380, Color.FromArgb(52, 152, 219));
+            btnQLNV_Cancel = CreateButton("↶ Hủy", 500, Color.FromArgb(149, 165, 166));
+            btnQLNV_BackMenu = CreateButton("← Menu", 620, Color.FromArgb(52, 73, 94));
+
+            pnlQLNV.Controls.AddRange(new Control[] {
+                btnQLNV_Them, btnQLNV_Xoa, btnQLNV_Sua,
+                btnQLNV_Save, btnQLNV_Cancel, btnQLNV_BackMenu
+            });
 
             tabQuanLyNV.Controls.Add(dgvNhanVien);
+            tabQuanLyNV.Controls.Add(pnlNVInput);
             tabQuanLyNV.Controls.Add(pnlQLNV);
 
             btnQLNV_Them.Click += btnQLNV_Them_Click;
@@ -158,6 +294,141 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             btnQLNV_Save.Click += btnQLNV_Save_Click;
             btnQLNV_Cancel.Click += btnQLNV_Cancel_Click;
             btnQLNV_BackMenu.Click += (s, ev) => tabControl.SelectedTab = tabMenu;
+
+            LoadChucVuData();
+        }
+
+        private void dgvNhanVien_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if (dgvNhanVien.Columns[e.ColumnIndex].Name == "TrangThai" && e.Value != null)
+            {
+                string trangThai = e.Value.ToString().Trim();
+                switch (trangThai)
+                {
+                    case "Đang làm":
+                        e.CellStyle.BackColor = Color.LightGreen;
+                        e.CellStyle.ForeColor = Color.DarkGreen;
+                        e.CellStyle.Font = new Font(dgvNhanVien.Font, FontStyle.Bold);
+                        break;
+                    case "Tạm nghỉ":
+                        e.CellStyle.BackColor = Color.LightYellow;
+                        e.CellStyle.ForeColor = Color.DarkOrange;
+                        break;
+                    case "Nghỉ việc":
+                        e.CellStyle.BackColor = Color.LightCoral;
+                        e.CellStyle.ForeColor = Color.DarkRed;
+                        break;
+                }
+            }
+        }
+
+        private void dgvNhanVien_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dgvNhanVien.SelectedRows.Count > 0 && !isDataChanged)
+            {
+                DataGridViewRow row = dgvNhanVien.SelectedRows[0];
+                txtMaNV.Text = row.Cells["MaNV"].Value?.ToString();
+                txtTenNV.Text = row.Cells["TenNV"].Value?.ToString();
+                txtMatKhau.Text = row.Cells["MatKhau"].Value?.ToString();
+
+                if (row.Cells["NgaySinh"].Value != null)
+                    dtpNgaySinh.Value = Convert.ToDateTime(row.Cells["NgaySinh"].Value);
+
+                if (row.Cells["GioiTinh"].Value != null)
+                {
+                    string gt = row.Cells["GioiTinh"].Value.ToString().Trim();
+                    cboGioiTinh.SelectedIndex = cboGioiTinh.FindStringExact(gt);
+                }
+
+                if (row.Cells["LuongMoiGio"].Value != null)
+                    nudLuongMoiGio.Value = Convert.ToDecimal(row.Cells["LuongMoiGio"].Value);
+
+                if (row.Cells["MaQuyen"].Value != null)
+                {
+                    string maQuyen = row.Cells["MaQuyen"].Value.ToString();
+                    for (int i = 0; i < cboChucVu.Items.Count; i++)
+                    {
+                        dynamic item = cboChucVu.Items[i];
+                        if (item.MaQuyen == maQuyen)
+                        {
+                            cboChucVu.SelectedIndex = i;
+                            break;
+                        }
+                    }
+                }
+
+                if (row.Cells["TrangThai"].Value != null)
+                {
+                    string tt = row.Cells["TrangThai"].Value.ToString().Trim();
+                    cboTrangThai.SelectedIndex = cboTrangThai.FindStringExact(tt);
+                }
+            }
+        }
+
+        private void LoadChucVuData()
+        {
+            try
+            {
+                using (SqlConnection conn = DatabaseConnection.OpenConnection())
+                {
+                    string query = @"SELECT DISTINCT n.MaQuyen, TenQuyen, ChucVu 
+                                   FROM Quyen q 
+                                   JOIN NhanVien n ON q.MaQuyen = n.MaQuyen 
+                                   ORDER BY n.MaQuyen";
+
+                    SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
+                    dtQuyen = new DataTable();
+                    adapter.Fill(dtQuyen);
+
+                    cboChucVu.Items.Clear();
+                    foreach (DataRow row in dtQuyen.Rows)
+                    {
+                        cboChucVu.Items.Add(new
+                        {
+                            Text = row["ChucVu"].ToString(),
+                            MaQuyen = row["MaQuyen"].ToString(),
+                            TenQuyen = row["TenQuyen"].ToString()
+                        });
+                    }
+
+                    cboChucVu.DisplayMember = "Text";
+                    if (cboChucVu.Items.Count > 0)
+                        cboChucVu.SelectedIndex = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi load chức vụ: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void GenerateNewMaNV()
+        {
+            try
+            {
+                using (SqlConnection conn = DatabaseConnection.OpenConnection())
+                {
+                    string query = "SELECT TOP 1 MaNV FROM NhanVien ORDER BY MaNV DESC";
+                    SqlCommand cmd = new SqlCommand(query, conn);
+                    object result = cmd.ExecuteScalar();
+
+                    if (result != null)
+                    {
+                        string lastMaNV = result.ToString();
+                        int number = int.Parse(lastMaNV.Substring(2));
+                        txtMaNV.Text = "NV" + (number + 1).ToString("D2");
+                    }
+                    else
+                    {
+                        txtMaNV.Text = "NV01";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtMaNV.Text = "NV01";
+            }
         }
 
         private void LoadNhanVienData()
@@ -190,50 +461,73 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi tải dữ liệu: " + ex.Message, "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi tải dữ liệu: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private bool ValidateNhanVienInput()
+        {
+            if (string.IsNullOrWhiteSpace(txtMaNV.Text))
+            {
+                MessageBox.Show("Vui lòng tạo mã nhân viên!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(txtTenNV.Text))
+            {
+                MessageBox.Show("Vui lòng nhập tên nhân viên!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtTenNV.Focus();
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(txtMatKhau.Text))
+            {
+                MessageBox.Show("Vui lòng nhập mật khẩu!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtMatKhau.Focus();
+                return false;
+            }
+            if (cboChucVu.SelectedItem == null)
+            {
+                MessageBox.Show("Vui lòng chọn chức vụ!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+            return true;
         }
 
         private void btnQLNV_Them_Click(object sender, EventArgs e)
         {
             if (!SessionInfo.IsAdmin)
             {
-                MessageBox.Show("Bạn không có quyền thêm nhân viên!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Bạn không có quyền thêm nhân viên!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            using (frmNhanVienDialog dialog = new frmNhanVienDialog(false))
-            {
-                if (dialog.ShowDialog() == DialogResult.OK)
-                {
-                    DataRow newRow = dtNhanVien.NewRow();
-                    newRow["MaNV"] = dialog.MaNV;
-                    newRow["TenNV"] = dialog.TenNV;
-                    newRow["ChucVu"] = dialog.ChucVu;
-                    newRow["NgaySinh"] = dialog.NgaySinh;
-                    newRow["GioiTinh"] = dialog.GioiTinh;
-                    newRow["MatKhau"] = dialog.MatKhau;
-                    newRow["LuongMoiGio"] = dialog.LuongMoiGio;
-                    newRow["MaQuyen"] = dialog.MaQuyen;
-                    newRow["TrangThai"] = dialog.TrangThai;
+            if (!ValidateNhanVienInput()) return;
 
-                    dtNhanVien.Rows.Add(newRow);
-                    isDataChanged = true;
+            dynamic selectedItem = cboChucVu.SelectedItem;
 
-                    MessageBox.Show("Đã thêm nhân viên vào danh sách!\nNhấn 'Lưu' để cập nhật database.",
-                        "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-            }
+            DataRow newRow = dtNhanVien.NewRow();
+            newRow["MaNV"] = txtMaNV.Text.Trim();
+            newRow["TenNV"] = txtTenNV.Text.Trim();
+            newRow["ChucVu"] = selectedItem.Text;
+            newRow["NgaySinh"] = dtpNgaySinh.Value;
+            newRow["GioiTinh"] = cboGioiTinh.SelectedItem.ToString();
+            newRow["MatKhau"] = txtMatKhau.Text.Trim();
+            newRow["LuongMoiGio"] = nudLuongMoiGio.Value;
+            newRow["MaQuyen"] = selectedItem.MaQuyen;
+            newRow["TrangThai"] = cboTrangThai.SelectedItem.ToString();
+
+            dtNhanVien.Rows.Add(newRow);
+            isDataChanged = true;
+
+            MessageBox.Show("✓ Đã thêm nhân viên!\nNhấn 'Lưu' để cập nhật database.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            ClearNhanVienInput();
+            GenerateNewMaNV();
         }
 
         private void btnQLNV_Xoa_Click(object sender, EventArgs e)
         {
             if (!SessionInfo.IsAdmin)
             {
-                MessageBox.Show("Bạn không có quyền xóa nhân viên!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Bạn không có quyền xóa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -242,19 +536,13 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                 string maNV = dgvNhanVien.SelectedRows[0].Cells["MaNV"].Value.ToString();
                 string tenNV = dgvNhanVien.SelectedRows[0].Cells["TenNV"].Value.ToString();
 
-                if (MessageBox.Show($"Bạn có chắc muốn xóa:\n{maNV} - {tenNV}?",
-                    "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                if (MessageBox.Show($"Xóa nhân viên:\n{maNV} - {tenNV}?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
                     dgvNhanVien.Rows.RemoveAt(dgvNhanVien.SelectedRows[0].Index);
                     isDataChanged = true;
-                    MessageBox.Show("Đã xóa! Nhấn 'Lưu' để cập nhật database.",
-                        "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("✓ Đã xóa! Nhấn 'Lưu' để cập nhật.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ClearNhanVienInput();
                 }
-            }
-            else
-            {
-                MessageBox.Show("Vui lòng chọn nhân viên cần xóa!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -262,34 +550,29 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         {
             if (!SessionInfo.IsAdmin)
             {
-                MessageBox.Show("Bạn không có quyền sửa!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Bạn không có quyền sửa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             if (dgvNhanVien.SelectedRows.Count > 0)
             {
+                if (!ValidateNhanVienInput()) return;
+
                 DataRow selectedRow = ((DataRowView)dgvNhanVien.SelectedRows[0].DataBoundItem).Row;
+                dynamic selectedItem = cboChucVu.SelectedItem;
 
-                using (frmNhanVienDialog dialog = new frmNhanVienDialog(true, selectedRow))
-                {
-                    if (dialog.ShowDialog() == DialogResult.OK)
-                    {
-                        selectedRow["TenNV"] = dialog.TenNV;
-                        selectedRow["ChucVu"] = dialog.ChucVu;
-                        selectedRow["NgaySinh"] = dialog.NgaySinh;
-                        selectedRow["GioiTinh"] = dialog.GioiTinh;
-                        selectedRow["MatKhau"] = dialog.MatKhau;
-                        selectedRow["LuongMoiGio"] = dialog.LuongMoiGio;
-                        selectedRow["MaQuyen"] = dialog.MaQuyen;
-                        selectedRow["TrangThai"] = dialog.TrangThai;
+                selectedRow["TenNV"] = txtTenNV.Text.Trim();
+                selectedRow["ChucVu"] = selectedItem.Text;
+                selectedRow["NgaySinh"] = dtpNgaySinh.Value;
+                selectedRow["GioiTinh"] = cboGioiTinh.SelectedItem.ToString();
+                selectedRow["MatKhau"] = txtMatKhau.Text.Trim();
+                selectedRow["LuongMoiGio"] = nudLuongMoiGio.Value;
+                selectedRow["MaQuyen"] = selectedItem.MaQuyen;
+                selectedRow["TrangThai"] = cboTrangThai.SelectedItem.ToString();
 
-                        isDataChanged = true;
-                        dgvNhanVien.Refresh();
-                        MessageBox.Show("Đã cập nhật! Nhấn 'Lưu' để lưu vào database.",
-                            "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                }
+                isDataChanged = true;
+                dgvNhanVien.Refresh();
+                MessageBox.Show("✓ Đã cập nhật! Nhấn 'Lưu' để lưu vào database.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -297,13 +580,11 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         {
             if (!isDataChanged)
             {
-                MessageBox.Show("Không có thay đổi!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Không có thay đổi!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            if (MessageBox.Show("Lưu các thay đổi?", "Xác nhận",
-                MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            if (MessageBox.Show("Lưu các thay đổi?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 int successCount = 0;
                 int errorCount = 0;
@@ -386,19 +667,17 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                     }
 
                     if (errorCount == 0)
-                        MessageBox.Show($"Lưu thành công! ({successCount} bản ghi)", "Thành công",
-                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show($"✓ Lưu thành công! ({successCount} bản ghi)", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     else
-                        MessageBox.Show($"Hoàn tất với lỗi:\n- Thành công: {successCount}\n- Lỗi: {errorCount}{errorMessages}",
-                            "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show($"Hoàn tất với lỗi:\n- Thành công: {successCount}\n- Lỗi: {errorCount}{errorMessages}", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                     isDataChanged = false;
                     LoadNhanVienData();
+                    ClearNhanVienInput();
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Lỗi: " + ex.Message, "Lỗi",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -407,10 +686,29 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         {
             if (isDataChanged)
             {
-                if (MessageBox.Show("Hủy thay đổi?", "Xác nhận",
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                if (MessageBox.Show("Hủy thay đổi?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
                     LoadNhanVienData();
+                    ClearNhanVienInput();
+                }
             }
+            else
+            {
+                ClearNhanVienInput();
+            }
+        }
+
+        private void ClearNhanVienInput()
+        {
+            txtMaNV.Clear();
+            txtTenNV.Clear();
+            txtMatKhau.Clear();
+            dtpNgaySinh.Value = DateTime.Now.AddYears(-18);
+            cboGioiTinh.SelectedIndex = 0;
+            cboTrangThai.SelectedIndex = 0;
+            nudLuongMoiGio.Value = 50000;
+            if (cboChucVu.Items.Count > 0)
+                cboChucVu.SelectedIndex = 0;
         }
         #endregion
 
@@ -420,7 +718,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             Panel pnlCCInput = new Panel();
             pnlCCInput.Dock = DockStyle.Top;
             pnlCCInput.Height = 80;
-            pnlCCInput.BackColor = Color.WhiteSmoke;
+            pnlCCInput.BackColor = Color.FromArgb(245, 245, 245);
 
             Label lblNhanVien = new Label();
             lblNhanVien.Text = "Nhân viên:";
@@ -510,9 +808,9 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             pnlChamCong.Height = 60;
             pnlChamCong.BackColor = Color.WhiteSmoke;
 
-            btnCC_Them = CreateButton("Chấm công", 20);
-            btnCC_Xoa = CreateButton("Xóa", 140);
-            btnCC_BackMenu = CreateButton("← Menu", 620);
+            btnCC_Them = CreateButton("✓ Chấm công", 20, Color.FromArgb(46, 204, 113));
+            btnCC_Xoa = CreateButton("🗑️ Xóa", 140, Color.FromArgb(231, 76, 60));
+            btnCC_BackMenu = CreateButton("← Menu", 620, Color.FromArgb(52, 73, 94));
 
             pnlChamCong.Controls.AddRange(new Control[] {
                 btnCC_Them, btnCC_Xoa, btnCC_BackMenu
@@ -524,6 +822,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             dgvChamCong.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvChamCong.ReadOnly = true;
             dgvChamCong.AllowUserToAddRows = false;
+            dgvChamCong.RowTemplate.Height = 30;
 
             tabChamCong.Controls.Add(dgvChamCong);
             tabChamCong.Controls.Add(pnlCCInput);
@@ -589,8 +888,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi tải dữ liệu: " + ex.Message, "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi tải dữ liệu: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -635,8 +933,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi lọc: " + ex.Message, "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi lọc: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -652,8 +949,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             {
                 if (cboNhanVienCC.SelectedItem == null)
                 {
-                    MessageBox.Show("Vui lòng chọn nhân viên!", "Thông báo",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Vui lòng chọn nhân viên!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
                 dynamic selectedItem = cboNhanVienCC.SelectedItem;
@@ -674,8 +970,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                     int count = (int)checkCmd.ExecuteScalar();
                     if (count > 0)
                     {
-                        MessageBox.Show("Đã chấm công ngày này!\n(Một ngày chỉ chấm công 1 lần = 8 giờ)",
-                            "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("Đã chấm công ngày này!\n(Một ngày chỉ chấm công 1 lần = 8 giờ)", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         return;
                     }
 
@@ -685,15 +980,13 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                     cmd.Parameters.AddWithValue("@MaNV", maNV);
                     cmd.ExecuteNonQuery();
 
-                    MessageBox.Show("✓ Chấm công thành công!\n(Tính 8 giờ làm việc)", "Thành công",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("✓ Chấm công thành công!\n(Tính 8 giờ làm việc)", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     LoadChamCongData();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi: " + ex.Message, "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -701,8 +994,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         {
             if (dgvChamCong.SelectedRows.Count > 0)
             {
-                if (MessageBox.Show("Xóa bản ghi chấm công này?", "Xác nhận",
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                if (MessageBox.Show("Xóa bản ghi chấm công này?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
                     try
                     {
@@ -718,14 +1010,12 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                             cmd.ExecuteNonQuery();
                         }
 
-                        MessageBox.Show("Xóa thành công!", "Thông báo",
-                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("✓ Xóa thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         LoadChamCongData();
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Lỗi: " + ex.Message, "Lỗi",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
@@ -738,7 +1028,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             Panel pnlTLInput = new Panel();
             pnlTLInput.Dock = DockStyle.Top;
             pnlTLInput.Height = 120;
-            pnlTLInput.BackColor = Color.WhiteSmoke;
+            pnlTLInput.BackColor = Color.FromArgb(245, 245, 245);
 
             Label lblNV = new Label();
             lblNV.Text = "Nhân viên:";
@@ -804,9 +1094,9 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             pnlTinhLuong.Height = 60;
             pnlTinhLuong.BackColor = Color.WhiteSmoke;
 
-            btnTL_TinhLuong = CreateButton("Tính lương", 20);
-            btnTL_Xoa = CreateButton("Xóa", 140);
-            btnTL_BackMenu = CreateButton("← Menu", 620);
+            btnTL_TinhLuong = CreateButton("💰 Tính lương", 20, Color.FromArgb(241, 196, 15));
+            btnTL_Xoa = CreateButton("🗑️ Xóa", 140, Color.FromArgb(231, 76, 60));
+            btnTL_BackMenu = CreateButton("← Menu", 620, Color.FromArgb(52, 73, 94));
 
             pnlTinhLuong.Controls.AddRange(new Control[] {
                 btnTL_TinhLuong, btnTL_Xoa, btnTL_BackMenu
@@ -818,6 +1108,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             dgvTinhLuong.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvTinhLuong.ReadOnly = true;
             dgvTinhLuong.AllowUserToAddRows = false;
+            dgvTinhLuong.RowTemplate.Height = 30;
 
             tabTinhLuong.Controls.Add(dgvTinhLuong);
             tabTinhLuong.Controls.Add(pnlTLInput);
@@ -848,7 +1139,6 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                     adapter.Fill(dtTinhLuong);
                     dgvTinhLuong.DataSource = dtTinhLuong;
 
-                    // Format tiền
                     if (dgvTinhLuong.Columns["Lương/Giờ"] != null)
                     {
                         dgvTinhLuong.Columns["Lương/Giờ"].DefaultCellStyle.Format = "N0";
@@ -864,9 +1154,9 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                         dgvTinhLuong.Columns["Tổng Lương"].DefaultCellStyle.Format = "N0";
                         dgvTinhLuong.Columns["Tổng Lương"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
                         dgvTinhLuong.Columns["Tổng Lương"].DefaultCellStyle.BackColor = Color.LightGreen;
+                        dgvTinhLuong.Columns["Tổng Lương"].DefaultCellStyle.Font = new Font(dgvTinhLuong.Font, FontStyle.Bold);
                     }
 
-                    // Load combo nhân viên
                     SqlCommand cmd = new SqlCommand("SELECT MaNV, TenNV FROM NhanVien ORDER BY MaNV", conn);
                     SqlDataReader reader = cmd.ExecuteReader();
                     cboNhanVienTL.Items.Clear();
@@ -884,8 +1174,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi tải dữ liệu: " + ex.Message, "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi tải dữ liệu: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -893,15 +1182,13 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         {
             if (!SessionInfo.IsAdmin)
             {
-                MessageBox.Show("Chỉ quản lý mới có quyền tính lương!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Chỉ quản lý mới có quyền tính lương!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             if (cboNhanVienTL.SelectedItem == null)
             {
-                MessageBox.Show("Vui lòng chọn nhân viên!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Vui lòng chọn nhân viên!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -938,8 +1225,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                             $"TỔNG LƯƠNG: {Convert.ToDecimal(reader["TongLuong"]):N0} VNĐ\n" +
                             $"━━━━━━━━━━━━━━━━━━━━━━";
 
-                        MessageBox.Show(thongBao, "Kết quả tính lương",
-                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show(thongBao, "Kết quả tính lương", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
 
@@ -947,8 +1233,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi: " + ex.Message, "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -956,15 +1241,13 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         {
             if (!SessionInfo.IsAdmin)
             {
-                MessageBox.Show("Chỉ quản lý mới có quyền xóa!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Chỉ quản lý mới có quyền xóa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             if (dgvTinhLuong.SelectedRows.Count > 0)
             {
-                if (MessageBox.Show("Xóa bản ghi lương này?", "Xác nhận",
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                if (MessageBox.Show("Xóa bản ghi lương này?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
                     try
                     {
@@ -983,46 +1266,194 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                             cmdDelete.ExecuteNonQuery();
                         }
 
-                        MessageBox.Show("Xóa thành công!", "Thông báo",
-                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("✓ Xóa thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         LoadTinhLuongData();
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Lỗi: " + ex.Message, "Lỗi",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
         }
         #endregion
 
-        #region Lịch Làm Việc
+        #region Lịch Làm Việc (Gộp CaLam)
         private void InitializeLichLamViecTab()
         {
+            // Split container để chia 2 phần
+            SplitContainer splitContainer = new SplitContainer();
+            splitContainer.Dock = DockStyle.Fill;
+            splitContainer.Orientation = Orientation.Vertical;
+            splitContainer.SplitterDistance = 500;
+
+            // Panel Left - Danh sách ca làm
+            Panel pnlLeft = new Panel();
+            pnlLeft.Dock = DockStyle.Fill;
+
+            Label lblCaLam = new Label();
+            lblCaLam.Text = "📋 DANH SÁCH CA LÀM VIỆC";
+            lblCaLam.Font = new Font("Segoe UI", 12, FontStyle.Bold);
+            lblCaLam.ForeColor = Color.FromArgb(52, 73, 94);
+            lblCaLam.Location = new Point(20, 80);
+            lblCaLam.AutoSize = true;
+
+            dgvCaLam = new DataGridView();
+            dgvCaLam.Location = new Point(20, 110);
+            dgvCaLam.Size = new Size(450, 400);
+            dgvCaLam.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvCaLam.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvCaLam.ReadOnly = true;
+            dgvCaLam.AllowUserToAddRows = false;
+            dgvCaLam.RowTemplate.Height = 30;
+            dgvCaLam.SelectionChanged += dgvCaLam_SelectionChanged;
+
+            // Panel thống kê ca làm
+            pnlThongKeCa = new Panel();
+            pnlThongKeCa.Location = new Point(20, 520);
+            pnlThongKeCa.Size = new Size(450, 100);
+            pnlThongKeCa.BackColor = Color.FromArgb(236, 240, 241);
+            pnlThongKeCa.BorderStyle = BorderStyle.FixedSingle;
+
+            Label lblThongKeTitle = new Label();
+            lblThongKeTitle.Text = "📊 THỐNG KÊ";
+            lblThongKeTitle.Font = new Font("Segoe UI", 11, FontStyle.Bold);
+            lblThongKeTitle.ForeColor = Color.FromArgb(52, 73, 94);
+            lblThongKeTitle.Location = new Point(10, 10);
+            lblThongKeTitle.AutoSize = true;
+
+            Label lblTongCa = new Label();
+            lblTongCa.Name = "lblTongCa";
+            lblTongCa.Text = "Tổng số ca: 0";
+            lblTongCa.Font = new Font("Segoe UI", 10);
+            lblTongCa.Location = new Point(20, 45);
+            lblTongCa.AutoSize = true;
+
+            Label lblTongNV = new Label();
+            lblTongNV.Name = "lblTongNV";
+            lblTongNV.Text = "Tổng số nhân viên: 0";
+            lblTongNV.Font = new Font("Segoe UI", 10);
+            lblTongNV.Location = new Point(20, 70);
+            lblTongNV.AutoSize = true;
+
+            pnlThongKeCa.Controls.AddRange(new Control[] { lblThongKeTitle, lblTongCa, lblTongNV });
+
+            pnlLeft.Controls.AddRange(new Control[] { lblCaLam, dgvCaLam, pnlThongKeCa });
+            splitContainer.Panel1.Controls.Add(pnlLeft);
+
+            // Panel Right - Nhân viên theo ca
+            Panel pnlRight = new Panel();
+            pnlRight.Dock = DockStyle.Fill;
+
+            Label lblNhanVienCa = new Label();
+            lblNhanVienCa.Text = "👥 NHÂN VIÊN THEO CA";
+            lblNhanVienCa.Font = new Font("Segoe UI", 12, FontStyle.Bold);
+            lblNhanVienCa.ForeColor = Color.FromArgb(52, 73, 94);
+            lblNhanVienCa.Location = new Point(20, 80);
+            lblNhanVienCa.AutoSize = true;
+
+            dgvNhanVienCa = new DataGridView();
+            dgvNhanVienCa.Location = new Point(20, 110);
+            dgvNhanVienCa.Size = new Size(580, 510);
+            dgvNhanVienCa.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvNhanVienCa.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvNhanVienCa.ReadOnly = true;
+            dgvNhanVienCa.AllowUserToAddRows = false;
+            dgvNhanVienCa.RowTemplate.Height = 30;
+
+            pnlRight.Controls.AddRange(new Control[] { lblNhanVienCa, dgvNhanVienCa });
+            splitContainer.Panel2.Controls.Add(pnlRight);
+
+            // Panel Filter ở trên cùng
+            Panel pnlFilter = new Panel();
+            pnlFilter.Dock = DockStyle.Top;
+            pnlFilter.Height = 70;
+            pnlFilter.BackColor = Color.FromArgb(245, 245, 245);
+
+            Label lblLocNgay = new Label();
+            lblLocNgay.Text = "🗓️ Lọc theo ngày:";
+            lblLocNgay.Location = new Point(20, 25);
+            lblLocNgay.AutoSize = true;
+            lblLocNgay.Font = new Font("Segoe UI", 9, FontStyle.Bold);
+
+            dtpLocNgay = new DateTimePicker();
+            dtpLocNgay.Location = new Point(140, 22);
+            dtpLocNgay.Width = 120;
+            dtpLocNgay.Format = DateTimePickerFormat.Short;
+
+            btnLocNgay = new Button();
+            btnLocNgay.Text = "Lọc ngày";
+            btnLocNgay.Location = new Point(270, 20);
+            btnLocNgay.Size = new Size(90, 27);
+            btnLocNgay.BackColor = Color.FromArgb(52, 152, 219);
+            btnLocNgay.ForeColor = Color.White;
+            btnLocNgay.FlatStyle = FlatStyle.Flat;
+            btnLocNgay.Cursor = Cursors.Hand;
+            btnLocNgay.Click += btnLocNgay_Click;
+
+            Label lblLocThang = new Label();
+            lblLocThang.Text = "📅 Tháng:";
+            lblLocThang.Location = new Point(390, 25);
+            lblLocThang.AutoSize = true;
+            lblLocThang.Font = new Font("Segoe UI", 9, FontStyle.Bold);
+
+            nudLocThang = new NumericUpDown();
+            nudLocThang.Location = new Point(460, 22);
+            nudLocThang.Width = 60;
+            nudLocThang.Minimum = 1;
+            nudLocThang.Maximum = 12;
+            nudLocThang.Value = DateTime.Now.Month;
+
+            Label lblLocNam = new Label();
+            lblLocNam.Text = "Năm:";
+            lblLocNam.Location = new Point(540, 25);
+            lblLocNam.AutoSize = true;
+
+            nudLocNam = new NumericUpDown();
+            nudLocNam.Location = new Point(585, 22);
+            nudLocNam.Width = 80;
+            nudLocNam.Minimum = 2020;
+            nudLocNam.Maximum = 2100;
+            nudLocNam.Value = DateTime.Now.Year;
+
+            btnLocThang = new Button();
+            btnLocThang.Text = "Lọc tháng";
+            btnLocThang.Location = new Point(675, 20);
+            btnLocThang.Size = new Size(90, 27);
+            btnLocThang.BackColor = Color.FromArgb(52, 152, 219);
+            btnLocThang.ForeColor = Color.White;
+            btnLocThang.FlatStyle = FlatStyle.Flat;
+            btnLocThang.Cursor = Cursors.Hand;
+            btnLocThang.Click += btnLocThang_Click;
+
+            btnHuyLocCa = new Button();
+            btnHuyLocCa.Text = "Hủy lọc";
+            btnHuyLocCa.Location = new Point(775, 20);
+            btnHuyLocCa.Size = new Size(90, 27);
+            btnHuyLocCa.BackColor = Color.FromArgb(189, 195, 199);
+            btnHuyLocCa.ForeColor = Color.White;
+            btnHuyLocCa.FlatStyle = FlatStyle.Flat;
+            btnHuyLocCa.Cursor = Cursors.Hand;
+            btnHuyLocCa.Click += btnHuyLocCa_Click;
+
+            pnlFilter.Controls.AddRange(new Control[] {
+                lblLocNgay, dtpLocNgay, btnLocNgay,
+                lblLocThang, nudLocThang, lblLocNam, nudLocNam,
+                btnLocThang, btnHuyLocCa
+            });
+
+            // Panel Bottom
             pnlLichLV = new Panel();
             pnlLichLV.Dock = DockStyle.Bottom;
             pnlLichLV.Height = 60;
             pnlLichLV.BackColor = Color.WhiteSmoke;
 
-            Button btnXemCaLam = CreateButton("📋 Xem Ca", 20);
-            btnXemCaLam.Width = 130;
-            btnXemCaLam.Click += btnXemCaLam_Click;
+            btnLLV_BackMenu = CreateButton("← Menu", 620, Color.FromArgb(52, 73, 94));
 
-            btnLLV_BackMenu = CreateButton("← Menu", 620);
+            pnlLichLV.Controls.Add(btnLLV_BackMenu);
 
-            pnlLichLV.Controls.AddRange(new Control[] {
-                btnXemCaLam, btnLLV_BackMenu
-            });
-
-            dgvLichLamViec = new DataGridView();
-            dgvLichLamViec.Dock = DockStyle.Fill;
-            dgvLichLamViec.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dgvLichLamViec.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvLichLamViec.ReadOnly = true;
-            dgvLichLamViec.AllowUserToAddRows = false;
-
-            tabLichLamViec.Controls.Add(dgvLichLamViec);
+            tabLichLamViec.Controls.Add(splitContainer);
+            tabLichLamViec.Controls.Add(pnlFilter);
             tabLichLamViec.Controls.Add(pnlLichLV);
 
             btnLLV_BackMenu.Click += (s, ev) => tabControl.SelectedTab = tabMenu;
@@ -1032,47 +1463,142 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         {
             try
             {
-                string query = @"SELECT llv.MaCa, 
-                                CONVERT(VARCHAR(5), llv.GioBD, 108) AS [Giờ Bắt Đầu],
-                                CONVERT(VARCHAR(5), llv.GioKT, 108) AS [Giờ Kết Thúc],
-                                COUNT(nv.MaNV) AS [Số Nhân Viên]
-                                FROM LichLamViec llv
-                                LEFT JOIN NhanVien nv ON llv.MaCa = nv.MaCa
-                                GROUP BY llv.MaCa, llv.GioBD, llv.GioKT
-                                ORDER BY llv.GioBD";
+                string query = @"SELECT MaCa, 
+                                CONVERT(VARCHAR(5), GioBD, 108) AS GioBatDau,
+                                CONVERT(VARCHAR(5), GioKT, 108) AS GioKetThuc
+                                FROM LichLamViec
+                                ORDER BY GioBD";
 
                 using (SqlConnection conn = DatabaseConnection.OpenConnection())
                 {
                     SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
-                    dtLichLamViec = new DataTable();
-                    adapter.Fill(dtLichLamViec);
-                    dgvLichLamViec.DataSource = dtLichLamViec;
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    dgvCaLam.DataSource = dt;
+
+                    UpdateThongKeCa(dt.Rows.Count, 0);
                 }
 
                 isDataChanged = false;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi tải dữ liệu: " + ex.Message, "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi tải dữ liệu: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void btnXemCaLam_Click(object sender, EventArgs e)
+        private void dgvCaLam_SelectionChanged(object sender, EventArgs e)
         {
-            frmXemCaLam formCaLam = new frmXemCaLam();
-            formCaLam.ShowDialog();
+            if (dgvCaLam.SelectedRows.Count > 0)
+            {
+                string maCa = dgvCaLam.SelectedRows[0].Cells["MaCa"].Value.ToString();
+                LoadNhanVienTheoCa(maCa);
+            }
+        }
+
+        private void LoadNhanVienTheoCa(string maCa, DateTime? ngay = null, int? thang = null, int? nam = null)
+        {
+            try
+            {
+                string query = @"SELECT DISTINCT nv.MaNV, nv.TenNV, nv.MaCa, nv.ChucVu
+                                FROM NhanVien nv
+                                WHERE nv.MaCa = @MaCa";
+
+                if (ngay.HasValue)
+                {
+                    query = @"SELECT DISTINCT nv.MaNV, nv.TenNV, nv.MaCa, nv.ChucVu, cc.NgayDiLam
+                            FROM NhanVien nv
+                            INNER JOIN ChamCong cc ON nv.MaNV = cc.MaNV
+                            WHERE nv.MaCa = @MaCa AND cc.NgayDiLam = @Ngay";
+                }
+                else if (thang.HasValue && nam.HasValue)
+                {
+                    query = @"SELECT DISTINCT nv.MaNV, nv.TenNV, nv.MaCa, nv.ChucVu, 
+                            COUNT(cc.NgayDiLam) AS SoNgayLam
+                            FROM NhanVien nv
+                            LEFT JOIN ChamCong cc ON nv.MaNV = cc.MaNV 
+                                AND MONTH(cc.NgayDiLam) = @Thang 
+                                AND YEAR(cc.NgayDiLam) = @Nam
+                            WHERE nv.MaCa = @MaCa
+                            GROUP BY nv.MaNV, nv.TenNV, nv.MaCa, nv.ChucVu";
+                }
+
+                using (SqlConnection conn = DatabaseConnection.OpenConnection())
+                {
+                    SqlCommand cmd = new SqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@MaCa", maCa);
+
+                    if (ngay.HasValue)
+                        cmd.Parameters.AddWithValue("@Ngay", ngay.Value.Date);
+
+                    if (thang.HasValue && nam.HasValue)
+                    {
+                        cmd.Parameters.AddWithValue("@Thang", thang.Value);
+                        cmd.Parameters.AddWithValue("@Nam", nam.Value);
+                    }
+
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    dgvNhanVienCa.DataSource = dt;
+
+                    UpdateThongKeCa(dgvCaLam.Rows.Count, dt.Rows.Count);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi tải nhân viên: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnLocNgay_Click(object sender, EventArgs e)
+        {
+            if (dgvCaLam.SelectedRows.Count > 0)
+            {
+                string maCa = dgvCaLam.SelectedRows[0].Cells["MaCa"].Value.ToString();
+                LoadNhanVienTheoCa(maCa, dtpLocNgay.Value.Date);
+            }
+        }
+
+        private void btnLocThang_Click(object sender, EventArgs e)
+        {
+            if (dgvCaLam.SelectedRows.Count > 0)
+            {
+                string maCa = dgvCaLam.SelectedRows[0].Cells["MaCa"].Value.ToString();
+                LoadNhanVienTheoCa(maCa, null, (int)nudLocThang.Value, (int)nudLocNam.Value);
+            }
+        }
+
+        private void btnHuyLocCa_Click(object sender, EventArgs e)
+        {
+            if (dgvCaLam.SelectedRows.Count > 0)
+            {
+                string maCa = dgvCaLam.SelectedRows[0].Cells["MaCa"].Value.ToString();
+                LoadNhanVienTheoCa(maCa);
+            }
+        }
+
+        private void UpdateThongKeCa(int tongCa, int tongNV)
+        {
+            var lblTongCa = pnlThongKeCa.Controls.Find("lblTongCa", false).FirstOrDefault() as Label;
+            var lblTongNV = pnlThongKeCa.Controls.Find("lblTongNV", false).FirstOrDefault() as Label;
+
+            if (lblTongCa != null)
+                lblTongCa.Text = $"📊 Tổng số ca: {tongCa}";
+
+            if (lblTongNV != null)
+                lblTongNV.Text = $"👥 Tổng số nhân viên: {tongNV}";
         }
         #endregion
 
         #region Helper Methods
-        private Button CreateButton(string text, int x)
+        private Button CreateButton(string text, int x, Color? bgColor = null)
         {
             Button btn = new Button();
             btn.Text = text;
             btn.Location = new Point(x, 10);
-            btn.Size = new Size(100, 40);
-            btn.BackColor = Color.FromArgb(52, 152, 219);
+            btn.Size = new Size(110, 40);
+            btn.BackColor = bgColor ?? Color.FromArgb(52, 152, 219);
             btn.ForeColor = Color.White;
             btn.FlatStyle = FlatStyle.Flat;
             btn.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
