@@ -273,7 +273,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             };
 
             Label lblNgaySinh = new Label { Text = "Ngày sinh: *", Location = new Point(20, 55), AutoSize = true };
-            dtpNgaySinh = new DateTimePicker { Location = new Point(150, 52), Width = 150, Format = DateTimePickerFormat.Short, MaxDate = DateTime.Now.AddYears(-18) };
+            dtpNgaySinh = new DateTimePicker { Location = new Point(150, 52), Width = 150, Format = DateTimePickerFormat.Short, MaxDate = DateTime.Now.AddYears(-17) };
 
             Label lblGioiTinh = new Label { Text = "Giới tính: *", Location = new Point(320, 55), AutoSize = true };
             cboGioiTinh = new ComboBox { Location = new Point(420, 52), Width = 100, DropDownStyle = ComboBoxStyle.DropDownList };
@@ -496,6 +496,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                 txtMaNV.Text = "NV01";
             }
         }
+       
 
         private void LoadNhanVienData()
         {
@@ -769,7 +770,11 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             txtMaNV.Clear();
             txtTenNV.Clear();
             txtMatKhau.Clear();
-            dtpNgaySinh.Value = DateTime.Now.AddYears(-18);
+            //dtpNgaySinh.Value = DateTime.Now.AddYears(-18);
+            DateTime macDinh = DateTime.Now.AddYears(-18);
+            if (macDinh < dtpNgaySinh.MinDate)
+                macDinh = dtpNgaySinh.MinDate;
+            dtpNgaySinh.Value = macDinh;
             cboGioiTinh.SelectedIndex = 0;
             cboTrangThai.SelectedIndex = 0;
             nudLuongMoiGio.Value = 50000;
@@ -887,7 +892,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             else
             {
                 pnlChamCong.Controls.AddRange(new Control[] {
-                    btnCC_Them, btnCC_Xoa
+                    btnCC_Them, btnThongTinCaNhan
                 });
             }
 

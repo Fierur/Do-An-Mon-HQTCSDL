@@ -6,7 +6,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec.Database
 {
     public class DatabaseConnection
     {
-        private static string serverName = "26.71.28.188\\MSSQL16SERVER";
+        private static string serverName = "A105PC35\\CSSQL22";
         private static string databaseName = "QuanLyQuanBar";
         private static string connectionString;
         private static SqlConnection currentConnection = null;
@@ -34,7 +34,8 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec.Database
 
                     // Kiểm tra xem user có tồn tại trong bảng NhanVien không
                     string query = "SELECT TenNV, n.MaQuyen, TenQuyen FROM NhanVien n join Quyen q ON q.MaQuyen = n.MaQuyen WHERE MaNV =  @MaNV";
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    string query1 = "select* from vw_ThongTinCaNhan v \r\njoin Quyen q on v.MaQuyen = q.MaQuyen";
+                    using (SqlCommand cmd = new SqlCommand(query1, conn))
                     {
                         cmd.Parameters.AddWithValue("@MaNV", username);
                         using (SqlDataReader reader = cmd.ExecuteReader())
