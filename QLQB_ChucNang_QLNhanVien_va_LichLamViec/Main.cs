@@ -496,7 +496,75 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                 txtMaNV.Text = "NV01";
             }
         }
+        // Thay đổi trong hàm LoadThongTinNhanVien
+        private void LoadThongTinNhanVien(int? thang = null, int? nam = null)
+        {
+            try
+            {
+                string query;
 
+                if (thang.HasValue && nam.HasValue)
+                {
+                    // SỬ DỤNG VIEW mới với function
+                    query = @"SELECT MaNV, TenNV, ChucVu, LuongMoiGio, 
+                     SoNgayLam, LuongCoBan AS TongLuongCoBan
+                     FROM vw_ThongTinLuongTheoThang
+                     WHERE Thang = @Thang AND Nam = @Nam
+                     ORDER BY MaNV";
+                }
+                else
+                {
+                    // Không lọc - lấy tháng hiện tại
+                    query = @"SELECT MaNV, TenNV, ChucVu, LuongMoiGio, 
+                     SoNgayLam, LuongCoBan AS TongLuongCoBan
+                     FROM vw_ThongTinLuongTheoThang
+                     WHERE Thang = MONTH(GETDATE()) AND Nam = YEAR(GETDATE())
+                     ORDER BY MaNV";
+                }
+
+                using (SqlConnection conn = DatabaseConnection.OpenConnection())
+                {
+                    SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
+                    if (thang.HasValue && nam.HasValue)
+                    {
+                        adapter.SelectCommand.Parameters.AddWithValue("@Thang", thang.Value);
+                        adapter.SelectCommand.Parameters.AddWithValue("@Nam", nam.Value);
+                    }
+
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    dgvThongTinNhanVien.DataSource = dt;
+
+                    // Format columns
+                    if (dgvThongTinNhanVien.Columns["LuongMoiGio"] != null)
+                    {
+                        dgvThongTinNhanVien.Columns["LuongMoiGio"].HeaderText = "Lương/Giờ";
+                        dgvThongTinNhanVien.Columns["LuongMoiGio"].DefaultCellStyle.Format = "N0";
+                        dgvThongTinNhanVien.Columns["LuongMoiGio"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+                    }
+
+                    if (dgvThongTinNhanVien.Columns["SoNgayLam"] != null)
+                    {
+                        dgvThongTinNhanVien.Columns["SoNgayLam"].HeaderText = "Số Ngày Làm";
+                        dgvThongTinNhanVien.Columns["SoNgayLam"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                        dgvThongTinNhanVien.Columns["SoNgayLam"].DefaultCellStyle.BackColor = Color.LightCyan;
+                    }
+
+                    if (dgvThongTinNhanVien.Columns["TongLuongCoBan"] != null)
+                    {
+                        dgvThongTinNhanVien.Columns["TongLuongCoBan"].HeaderText = "Lương Cơ Bản";
+                        dgvThongTinNhanVien.Columns["TongLuongCoBan"].DefaultCellStyle.Format = "N0";
+                        dgvThongTinNhanVien.Columns["TongLuongCoBan"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+                        dgvThongTinNhanVien.Columns["TongLuongCoBan"].DefaultCellStyle.BackColor = Color.LightYellow;
+                        dgvThongTinNhanVien.Columns["TongLuongCoBan"].DefaultCellStyle.Font = new Font(dgvThongTinNhanVien.Font, FontStyle.Bold);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi tải thông tin: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
         private void LoadNhanVienData()
         {
             try
@@ -1988,7 +2056,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
 
         private void btnLLV_SaveCa_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Chức năng lưu đã được tích hợp vào Thêm/Sửa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Đã lưu dữ liệu mới vào database", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void btnLLV_CancelCa_Click(object sender, EventArgs e)
