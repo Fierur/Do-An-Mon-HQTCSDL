@@ -39,12 +39,13 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         private Button btnLLV_ThemNVCa, btnLLV_XoaNVCa;
         private TextBox txtMaCaNew, txtGioBDNew, txtGioKTNew;
         private ComboBox cboNhanVienCaLam, cboCaLamChon;
-
+        private SplitContainer splitContainer;
         public frmMain()
         {
             InitializeComponent();
             InitializeTabControls();
             InitializeMenuHeader();
+            
         }
 
         private void InitializeMenuHeader()
@@ -164,6 +165,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
 
         private void frmMain_Load(object sender, EventArgs e)
         {
+            splitContainer.SplitterDistance = 500;
             lblMenuWelcome.Text = $"Chào mừng, {SessionInfo.TenNV}";
 
             // Xóa pnlHeader khỏi form chính

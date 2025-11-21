@@ -94,11 +94,18 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         /// 
         private void InitializeLichLamViecTab()
         {
-            SplitContainer splitContainer = new SplitContainer();
+            //SplitContainer splitContainer = new SplitContainer();
+            //splitContainer.Dock = DockStyle.Fill;
+            //splitContainer.Orientation = Orientation.Vertical;
+            //splitContainer.SplitterDistance = 300;   
+
+            splitContainer = new SplitContainer();   // ← dùng biến GLOBAL
             splitContainer.Dock = DockStyle.Fill;
             splitContainer.Orientation = Orientation.Vertical;
-            splitContainer.SplitterDistance = 460;
 
+            splitContainer.SplitterDistance = 350;     // set lần đầu
+            splitContainer.SplitterWidth = 4;          // chỉnh độ dày thanh kéo
+            splitContainer.IsSplitterFixed = false;    // cho phép kéo tự do
             // Panel Left - Ca làm việc
             Panel pnlLeft = new Panel();
             pnlLeft.Dock = DockStyle.Fill;
@@ -238,12 +245,12 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             lblNhanVienCa.Text = "👥 NHÂN VIÊN THEO CA";
             lblNhanVienCa.Font = new Font("Segoe UI", 12, FontStyle.Bold);
             lblNhanVienCa.ForeColor = Color.FromArgb(52, 73, 94);
-            lblNhanVienCa.Location = new Point(20, 80);
+            lblNhanVienCa.Location = new Point(20, 20);
             lblNhanVienCa.AutoSize = true;
 
             dgvNhanVienCa = new DataGridView();
-            dgvNhanVienCa.Location = new Point(20, 110);
-            dgvNhanVienCa.Size = new Size(580, 400);
+            dgvNhanVienCa.Location = new Point(20, 45);
+            dgvNhanVienCa.Size = new Size(580, 325);
             dgvNhanVienCa.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvNhanVienCa.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvNhanVienCa.ReadOnly = true;
@@ -252,13 +259,13 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
 
             // Panel điều chỉnh nhân viên ca
             Panel pnlNVCaInput = new Panel();
-            pnlNVCaInput.Location = new Point(20, 520);
+            pnlNVCaInput.Location = new Point(20, 375);
             pnlNVCaInput.Size = new Size(580, 80);
             pnlNVCaInput.BackColor = Color.FromArgb(236, 240, 241);
             pnlNVCaInput.BorderStyle = BorderStyle.FixedSingle;
 
             Label lblNVCaTitle = new Label();
-            lblNVCaTitle.Text = "👤 ĐIỀU CHỈNH NHÂN VIÊN CA";
+            lblNVCaTitle.Text = "👤 ĐIỀU CHỈNH CA LÀM NHÂN VIÊN";
             lblNVCaTitle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
             lblNVCaTitle.Location = new Point(10, 10);
             lblNVCaTitle.AutoSize = true;

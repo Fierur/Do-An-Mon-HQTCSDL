@@ -50,7 +50,7 @@
             this.pnlMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlMain.Location = new System.Drawing.Point(0, 0);
             this.pnlMain.Name = "pnlMain";
-            this.pnlMain.Size = new System.Drawing.Size(385, 347);
+            this.pnlMain.Size = new System.Drawing.Size(385, 316);
             this.pnlMain.TabIndex = 0;
             // 
             // chkShowPassword
