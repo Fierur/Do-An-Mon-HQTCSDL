@@ -71,7 +71,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         private System.Windows.Forms.Button btnLLV_Save;
         private System.Windows.Forms.Button btnLLV_Cancel;
         private System.Windows.Forms.Button btnLLV_BackMenu;
-
+        
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
@@ -92,15 +92,343 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         /// the contents of this method with the code editor.
         /// </summary>
         /// 
+        //private void InitializeLichLamViecTab()
+        //{
+        //    splitContainer = new SplitContainer();  
+        //    splitContainer.Dock = DockStyle.Fill;
+        //    splitContainer.Orientation = Orientation.Vertical;
+
+        //    splitContainer.SplitterDistance = 350;     
+        //    splitContainer.SplitterWidth = 4;          
+        //    splitContainer.IsSplitterFixed = false;    
+        //    // Panel Left - Ca làm việc
+        //    Panel pnlLeft = new Panel();
+        //    pnlLeft.Dock = DockStyle.Fill;
+
+        //    Label lblCaLam = new Label();
+        //    lblCaLam.Text = "📋 DANH SÁCH CA LÀM VIỆC";
+        //    lblCaLam.Font = new Font("Segoe UI", 12, FontStyle.Bold);
+        //    lblCaLam.ForeColor = Color.FromArgb(52, 73, 94);
+        //    lblCaLam.Location = new Point(20, 20);
+        //    lblCaLam.AutoSize = true;
+
+        //    dgvCaLam = new DataGridView();
+        //    dgvCaLam.Location = new Point(20, 45); 
+        //    dgvCaLam.Size = new Size(450, 200);
+        //    dgvCaLam.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        //    dgvCaLam.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+        //    dgvCaLam.ReadOnly = true;
+        //    dgvCaLam.AllowUserToAddRows = false;
+        //    dgvCaLam.RowTemplate.Height = 30;
+        //    dgvCaLam.SelectionChanged += dgvCaLam_SelectionChanged;
+
+        //    // Panel input ca làm mới
+        //    Panel pnlCaInput = new Panel();
+        //    pnlCaInput.Location = new Point(20, 250);
+        //    pnlCaInput.Size = new Size(450, 120);
+        //    pnlCaInput.BackColor = Color.FromArgb(236, 240, 241);
+        //    pnlCaInput.BorderStyle = BorderStyle.FixedSingle;
+
+        //    Label lblCaInputTitle = new Label();
+        //    lblCaInputTitle.Text = "🕐 THÊM/SỬA CA LÀM";
+        //    lblCaInputTitle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
+        //    lblCaInputTitle.Location = new Point(10, 10);
+        //    lblCaInputTitle.AutoSize = true;
+
+        //    Label lblMaCa = new Label();
+        //    lblMaCa.Text = "Mã ca:";
+        //    lblMaCa.Location = new Point(15, 45);
+        //    lblMaCa.AutoSize = true;
+
+        //    txtMaCaNew = new TextBox();
+        //    txtMaCaNew.Location = new Point(80, 42);
+        //    txtMaCaNew.Width = 80;
+
+        //    Label lblGioBD = new Label();
+        //    lblGioBD.Text = "Giờ BĐ:";
+        //    lblGioBD.Location = new Point(180, 45);
+        //    lblGioBD.AutoSize = true;
+
+        //    txtGioBDNew = new TextBox();
+        //    txtGioBDNew.Location = new Point(250, 42);
+        //    txtGioBDNew.Width = 80;
+
+        //    //
+        //    DateTimePicker dtpGioBD = new DateTimePicker();
+        //    dtpGioBD.Location = new Point(250, 42);
+        //    dtpGioBD.Width = 80;
+        //    dtpGioBD.Format = DateTimePickerFormat.Custom;
+        //    dtpGioBD.CustomFormat = "HH:mm:ss";
+        //    dtpGioBD.ShowUpDown = true;
+        //    dtpGioBD.Value = DateTime.Today;
+        //    //
+        //    txtGioBDNew.ForeColor = Color.Gray;
+        //    txtGioBDNew.Text = "HH:mm:ss";
+        //    txtGioBDNew.Enter += (s, ev) => {
+        //        if (txtGioBDNew.Text == "HH:mm:ss")
+        //        {
+        //            txtGioBDNew.Text = "";
+        //            txtGioBDNew.ForeColor = Color.Black;
+        //        }
+        //    };
+        //    txtGioBDNew.Leave += (s, ev) => {
+        //        if (string.IsNullOrWhiteSpace(txtGioBDNew.Text))
+        //        {
+        //            txtGioBDNew.Text = "HH:mm:ss";
+        //            txtGioBDNew.ForeColor = Color.Gray;
+        //        }
+        //    };
+
+        //    Label lblGioKT = new Label();
+        //    lblGioKT.Text = "Giờ KT:";
+        //    lblGioKT.Location = new Point(15, 80);
+        //    lblGioKT.AutoSize = true;
+
+        //    txtGioKTNew = new TextBox();
+        //    txtGioKTNew.Location = new Point(80, 77);
+        //    txtGioKTNew.Width = 80;
+        //    //
+        //    DateTimePicker dtpGioKT = new DateTimePicker();
+        //    dtpGioKT.Location = new Point(80, 77);
+        //    dtpGioKT.Width = 80;
+        //    dtpGioKT.Format = DateTimePickerFormat.Custom;
+        //    dtpGioKT.CustomFormat = "HH:mm:ss";
+        //    dtpGioKT.ShowUpDown = true;
+        //    dtpGioKT.Value = DateTime.Today;
+        //    //
+        //    txtGioKTNew.ForeColor = Color.Gray;
+        //    txtGioKTNew.Text = "HH:mm:ss";
+        //    txtGioKTNew.Enter += (s, ev) => {
+        //        if (txtGioKTNew.Text == "HH:mm:ss")
+        //        {
+        //            txtGioKTNew.Text = "";
+        //            txtGioKTNew.ForeColor = Color.Black;
+        //        }
+        //    };
+        //    txtGioKTNew.Leave += (s, ev) => {
+        //        if (string.IsNullOrWhiteSpace(txtGioKTNew.Text))
+        //        {
+        //            txtGioKTNew.Text = "HH:mm:ss";
+        //            txtGioKTNew.ForeColor = Color.Gray;
+        //        }
+        //    };
+
+        //    pnlCaInput.Controls.AddRange(new Control[] {
+        //        lblCaInputTitle, lblMaCa, txtMaCaNew, lblGioBD, dtpGioBD,
+        //        lblGioKT, dtpGioKT
+        //    });
+
+        //    // Panel thống kê
+        //    pnlThongKeCa = new Panel();
+        //    pnlThongKeCa.Location = new Point(20, 375);
+        //    pnlThongKeCa.Size = new Size(450, 100);
+        //    pnlThongKeCa.BackColor = Color.FromArgb(236, 240, 241);
+        //    pnlThongKeCa.BorderStyle = BorderStyle.FixedSingle;
+
+        //    Label lblThongKeTitle = new Label();
+        //    lblThongKeTitle.Text = "📊 THỐNG KÊ";
+        //    lblThongKeTitle.Font = new Font("Segoe UI", 11, FontStyle.Bold);
+        //    lblThongKeTitle.ForeColor = Color.FromArgb(52, 73, 94);
+        //    lblThongKeTitle.Location = new Point(10, 10);
+        //    lblThongKeTitle.AutoSize = true;
+
+        //    Label lblTongCa = new Label();
+        //    lblTongCa.Name = "lblTongCa";
+        //    lblTongCa.Text = "Tổng số ca: 0";
+        //    lblTongCa.Font = new Font("Segoe UI", 10);
+        //    lblTongCa.Location = new Point(20, 45);
+        //    lblTongCa.AutoSize = true;
+
+        //    Label lblTongNV = new Label();
+        //    lblTongNV.Name = "lblTongNV";
+        //    lblTongNV.Text = "Tổng số nhân viên: 0";
+        //    lblTongNV.Font = new Font("Segoe UI", 10);
+        //    lblTongNV.Location = new Point(20, 70);
+        //    lblTongNV.AutoSize = true;
+
+        //    pnlThongKeCa.Controls.AddRange(new Control[] { lblThongKeTitle, lblTongCa, lblTongNV });
+
+        //    pnlLeft.Controls.AddRange(new Control[] { lblCaLam, dgvCaLam, pnlCaInput, pnlThongKeCa });
+        //    splitContainer.Panel1.Controls.Add(pnlLeft);
+
+        //    // Panel Right - Nhân viên theo ca
+        //    Panel pnlRight = new Panel();
+        //    pnlRight.Dock = DockStyle.Fill;
+
+        //    Label lblNhanVienCa = new Label();
+        //    lblNhanVienCa.Text = "👥 NHÂN VIÊN THEO CA";
+        //    lblNhanVienCa.Font = new Font("Segoe UI", 12, FontStyle.Bold);
+        //    lblNhanVienCa.ForeColor = Color.FromArgb(52, 73, 94);
+        //    lblNhanVienCa.Location = new Point(20, 20);
+        //    lblNhanVienCa.AutoSize = true;
+
+        //    dgvNhanVienCa = new DataGridView();
+        //    dgvNhanVienCa.Location = new Point(20, 45);
+        //    dgvNhanVienCa.Size = new Size(580, 325);
+        //    dgvNhanVienCa.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        //    dgvNhanVienCa.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+        //    dgvNhanVienCa.ReadOnly = true;
+        //    dgvNhanVienCa.AllowUserToAddRows = false;
+        //    dgvNhanVienCa.RowTemplate.Height = 30;
+
+        //    // Panel điều chỉnh nhân viên ca
+        //    Panel pnlNVCaInput = new Panel();
+        //    pnlNVCaInput.Location = new Point(20, 375);
+        //    pnlNVCaInput.Size = new Size(580, 80);
+        //    pnlNVCaInput.BackColor = Color.FromArgb(236, 240, 241);
+        //    pnlNVCaInput.BorderStyle = BorderStyle.FixedSingle;
+
+        //    Label lblNVCaTitle = new Label();
+        //    lblNVCaTitle.Text = "👤 ĐIỀU CHỈNH CA LÀM NHÂN VIÊN";
+        //    lblNVCaTitle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
+        //    lblNVCaTitle.Location = new Point(10, 10);
+        //    lblNVCaTitle.AutoSize = true;
+
+        //    Label lblNVChon = new Label();
+        //    lblNVChon.Text = "Nhân viên:";
+        //    lblNVChon.Location = new Point(15, 45);
+        //    lblNVChon.AutoSize = true;
+
+        //    cboNhanVienCaLam = new ComboBox();
+        //    cboNhanVienCaLam.Location = new Point(100, 42);
+        //    cboNhanVienCaLam.Width = 200;
+        //    cboNhanVienCaLam.DropDownStyle = ComboBoxStyle.DropDownList;
+
+        //    Label lblCaChon = new Label();
+        //    lblCaChon.Text = "Ca làm:";
+        //    lblCaChon.Location = new Point(320, 45);
+        //    lblCaChon.AutoSize = true;
+
+        //    cboCaLamChon = new ComboBox();
+        //    cboCaLamChon.Location = new Point(380, 42);
+        //    cboCaLamChon.Width = 100;
+        //    cboCaLamChon.DropDownStyle = ComboBoxStyle.DropDownList;
+
+        //    pnlNVCaInput.Controls.AddRange(new Control[] {
+        //        lblNVCaTitle, lblNVChon, cboNhanVienCaLam, lblCaChon, cboCaLamChon
+        //    });
+
+        //    pnlRight.Controls.AddRange(new Control[] { lblNhanVienCa, dgvNhanVienCa, pnlNVCaInput });
+        //    splitContainer.Panel2.Controls.Add(pnlRight);
+
+        //    // Panel Filter
+        //    Panel pnlFilter = new Panel();
+        //    pnlFilter.Dock = DockStyle.Top;
+        //    pnlFilter.Height = 70;
+        //    pnlFilter.BackColor = Color.FromArgb(245, 245, 245);
+
+        //    Label lblLocNgay = new Label();
+        //    lblLocNgay.Text = "🗓️ Lọc theo ngày:";
+        //    lblLocNgay.Location = new Point(20, 25);
+        //    lblLocNgay.AutoSize = true;
+        //    lblLocNgay.Font = new Font("Segoe UI", 9, FontStyle.Bold);
+
+        //    dtpLocNgay = new DateTimePicker();
+        //    dtpLocNgay.Location = new Point(140, 22);
+        //    dtpLocNgay.Width = 120;
+        //    dtpLocNgay.Format = DateTimePickerFormat.Short;
+
+        //    btnLocNgay = new Button();
+        //    btnLocNgay.Text = "Lọc ngày";
+        //    btnLocNgay.Location = new Point(270, 20);
+        //    btnLocNgay.Size = new Size(90, 27);
+        //    btnLocNgay.BackColor = Color.FromArgb(52, 152, 219);
+        //    btnLocNgay.ForeColor = Color.White;
+        //    btnLocNgay.FlatStyle = FlatStyle.Flat;
+        //    btnLocNgay.Cursor = Cursors.Hand;
+        //    btnLocNgay.Click += btnLocNgay_Click;
+
+        //    Label lblLocThang = new Label();
+        //    lblLocThang.Text = "📅 Tháng:";
+        //    lblLocThang.Location = new Point(390, 25);
+        //    lblLocThang.AutoSize = true;
+        //    lblLocThang.Font = new Font("Segoe UI", 9, FontStyle.Bold);
+
+        //    nudLocThang = new NumericUpDown();
+        //    nudLocThang.Location = new Point(460, 22);
+        //    nudLocThang.Width = 60;
+        //    nudLocThang.Minimum = 1;
+        //    nudLocThang.Maximum = 12;
+        //    nudLocThang.Value = DateTime.Now.Month;
+
+        //    Label lblLocNam = new Label();
+        //    lblLocNam.Text = "Năm:";
+        //    lblLocNam.Location = new Point(540, 25);
+        //    lblLocNam.AutoSize = true;
+
+        //    nudLocNam = new NumericUpDown();
+        //    nudLocNam.Location = new Point(585, 22);
+        //    nudLocNam.Width = 80;
+        //    nudLocNam.Minimum = 2020;
+        //    nudLocNam.Maximum = 2100;
+        //    nudLocNam.Value = DateTime.Now.Year;
+
+        //    btnLocThang = new Button();
+        //    btnLocThang.Text = "Lọc tháng";
+        //    btnLocThang.Location = new Point(675, 20);
+        //    btnLocThang.Size = new Size(90, 27);
+        //    btnLocThang.BackColor = Color.FromArgb(52, 152, 219);
+        //    btnLocThang.ForeColor = Color.White;
+        //    btnLocThang.FlatStyle = FlatStyle.Flat;
+        //    btnLocThang.Cursor = Cursors.Hand;
+        //    btnLocThang.Click += btnLocThang_Click;
+
+        //    btnHuyLocCa = new Button();
+        //    btnHuyLocCa.Text = "Hủy lọc";
+        //    btnHuyLocCa.Location = new Point(775, 20);
+        //    btnHuyLocCa.Size = new Size(90, 27);
+        //    btnHuyLocCa.BackColor = Color.FromArgb(189, 195, 199);
+        //    btnHuyLocCa.ForeColor = Color.White;
+        //    btnHuyLocCa.FlatStyle = FlatStyle.Flat;
+        //    btnHuyLocCa.Cursor = Cursors.Hand;
+        //    btnHuyLocCa.Click += btnHuyLocCa_Click;
+
+        //    pnlFilter.Controls.AddRange(new Control[] {
+        //        lblLocNgay, dtpLocNgay, btnLocNgay,
+        //        lblLocThang, nudLocThang, lblLocNam, nudLocNam,
+        //        btnLocThang, btnHuyLocCa
+        //    });
+
+        //    // Panel Bottom
+        //    pnlLichLV = new Panel();
+        //    pnlLichLV.Dock = DockStyle.Bottom;
+        //    pnlLichLV.Height = 60;
+        //    pnlLichLV.BackColor = Color.WhiteSmoke;
+
+        //    btnLLV_ThemCa = CreateButton("➕ Thêm ca", 20, Color.FromArgb(46, 204, 113));
+        //    btnLLV_SuaCa = CreateButton("✏️ Sửa ca", 140, Color.FromArgb(241, 196, 15));
+        //    btnLLV_XoaCa = CreateButton("🗑️ Xóa ca", 260, Color.FromArgb(231, 76, 60));
+        //    btnLLV_SaveCa = CreateButton("💾 Lưu ca", 380, Color.FromArgb(52, 152, 219));
+        //    btnLLV_CancelCa = CreateButton("↶ Hủy", 500, Color.FromArgb(149, 165, 166));
+        //    btnLLV_ThemNVCa = CreateButton("👤+ Gán NV", 620, Color.FromArgb(155, 89, 182));
+        //    btnLLV_XoaNVCa = CreateButton("👤✖ Bỏ NV", 740, Color.FromArgb(192, 57, 43));
+        //    btnLLV_BackMenu = CreateButton("← Menu", 860, Color.FromArgb(52, 73, 94));
+
+        //    pnlLichLV.Controls.AddRange(new Control[] {
+        //        btnLLV_ThemCa, btnLLV_SuaCa, btnLLV_XoaCa, btnLLV_SaveCa, btnLLV_CancelCa,
+        //        btnLLV_ThemNVCa, btnLLV_XoaNVCa, btnLLV_BackMenu
+        //    });
+
+        //    tabLichLamViec.Controls.Add(splitContainer);
+        //    tabLichLamViec.Controls.Add(pnlFilter);
+        //    tabLichLamViec.Controls.Add(pnlLichLV);
+
+        //    btnLLV_ThemCa.Click += btnLLV_ThemCa_Click;
+        //    btnLLV_SuaCa.Click += btnLLV_SuaCa_Click;
+        //    btnLLV_XoaCa.Click += btnLLV_XoaCa_Click;
+        //    btnLLV_SaveCa.Click += btnLLV_SaveCa_Click;
+        //    btnLLV_CancelCa.Click += btnLLV_CancelCa_Click;
+        //    btnLLV_BackMenu.Click += (s, ev) => tabControl.SelectedTab = tabMenu;
+        //}
         private void InitializeLichLamViecTab()
         {
-            splitContainer = new SplitContainer();  
+            splitContainer = new SplitContainer();
             splitContainer.Dock = DockStyle.Fill;
             splitContainer.Orientation = Orientation.Vertical;
+            splitContainer.SplitterDistance = 350;
+            splitContainer.SplitterWidth = 4;
+            splitContainer.IsSplitterFixed = false;
 
-            splitContainer.SplitterDistance = 350;     
-            splitContainer.SplitterWidth = 4;          
-            splitContainer.IsSplitterFixed = false;    
             // Panel Left - Ca làm việc
             Panel pnlLeft = new Panel();
             pnlLeft.Dock = DockStyle.Fill;
@@ -113,7 +441,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             lblCaLam.AutoSize = true;
 
             dgvCaLam = new DataGridView();
-            dgvCaLam.Location = new Point(20, 45); 
+            dgvCaLam.Location = new Point(20, 45);
             dgvCaLam.Size = new Size(450, 200);
             dgvCaLam.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvCaLam.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
@@ -123,7 +451,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             dgvCaLam.SelectionChanged += dgvCaLam_SelectionChanged;
 
             // Panel input ca làm mới
-            Panel pnlCaInput = new Panel();
+            pnlCaInput = new Panel();
             pnlCaInput.Location = new Point(20, 250);
             pnlCaInput.Size = new Size(450, 120);
             pnlCaInput.BackColor = Color.FromArgb(236, 240, 241);
@@ -149,74 +477,33 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             lblGioBD.Location = new Point(180, 45);
             lblGioBD.AutoSize = true;
 
-            txtGioBDNew = new TextBox();
-            txtGioBDNew.Location = new Point(250, 42);
-            txtGioBDNew.Width = 80;
-
-            //
-            DateTimePicker dtpGioBD = new DateTimePicker();
+            // Đặt định dạng HH:mm:ss
+            dtpGioBD = new DateTimePicker();
             dtpGioBD.Location = new Point(250, 42);
-            dtpGioBD.Width = 80;
+            dtpGioBD.Width = 100;
             dtpGioBD.Format = DateTimePickerFormat.Custom;
             dtpGioBD.CustomFormat = "HH:mm:ss";
             dtpGioBD.ShowUpDown = true;
             dtpGioBD.Value = DateTime.Today;
-            //
-            txtGioBDNew.ForeColor = Color.Gray;
-            txtGioBDNew.Text = "HH:mm:ss";
-            txtGioBDNew.Enter += (s, ev) => {
-                if (txtGioBDNew.Text == "HH:mm:ss")
-                {
-                    txtGioBDNew.Text = "";
-                    txtGioBDNew.ForeColor = Color.Black;
-                }
-            };
-            txtGioBDNew.Leave += (s, ev) => {
-                if (string.IsNullOrWhiteSpace(txtGioBDNew.Text))
-                {
-                    txtGioBDNew.Text = "HH:mm:ss";
-                    txtGioBDNew.ForeColor = Color.Gray;
-                }
-            };
 
             Label lblGioKT = new Label();
             lblGioKT.Text = "Giờ KT:";
             lblGioKT.Location = new Point(15, 80);
             lblGioKT.AutoSize = true;
 
-            txtGioKTNew = new TextBox();
-            txtGioKTNew.Location = new Point(80, 77);
-            txtGioKTNew.Width = 80;
-            //
-            DateTimePicker dtpGioKT = new DateTimePicker();
+            // Đặt định dạng HH:mm:ss
+            dtpGioKT = new DateTimePicker();
             dtpGioKT.Location = new Point(80, 77);
-            dtpGioKT.Width = 80;
+            dtpGioKT.Width = 100;
             dtpGioKT.Format = DateTimePickerFormat.Custom;
             dtpGioKT.CustomFormat = "HH:mm:ss";
             dtpGioKT.ShowUpDown = true;
             dtpGioKT.Value = DateTime.Today;
-            //
-            txtGioKTNew.ForeColor = Color.Gray;
-            txtGioKTNew.Text = "HH:mm:ss";
-            txtGioKTNew.Enter += (s, ev) => {
-                if (txtGioKTNew.Text == "HH:mm:ss")
-                {
-                    txtGioKTNew.Text = "";
-                    txtGioKTNew.ForeColor = Color.Black;
-                }
-            };
-            txtGioKTNew.Leave += (s, ev) => {
-                if (string.IsNullOrWhiteSpace(txtGioKTNew.Text))
-                {
-                    txtGioKTNew.Text = "HH:mm:ss";
-                    txtGioKTNew.ForeColor = Color.Gray;
-                }
-            };
 
             pnlCaInput.Controls.AddRange(new Control[] {
-                lblCaInputTitle, lblMaCa, txtMaCaNew, lblGioBD, dtpGioBD,
-                lblGioKT, dtpGioKT
-            });
+        lblCaInputTitle, lblMaCa, txtMaCaNew, lblGioBD, dtpGioBD,
+        lblGioKT, dtpGioKT
+    });
 
             // Panel thống kê
             pnlThongKeCa = new Panel();
@@ -305,8 +592,8 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             cboCaLamChon.DropDownStyle = ComboBoxStyle.DropDownList;
 
             pnlNVCaInput.Controls.AddRange(new Control[] {
-                lblNVCaTitle, lblNVChon, cboNhanVienCaLam, lblCaChon, cboCaLamChon
-            });
+        lblNVCaTitle, lblNVChon, cboNhanVienCaLam, lblCaChon, cboCaLamChon
+    });
 
             pnlRight.Controls.AddRange(new Control[] { lblNhanVienCa, dgvNhanVienCa, pnlNVCaInput });
             splitContainer.Panel2.Controls.Add(pnlRight);
@@ -384,10 +671,10 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             btnHuyLocCa.Click += btnHuyLocCa_Click;
 
             pnlFilter.Controls.AddRange(new Control[] {
-                lblLocNgay, dtpLocNgay, btnLocNgay,
-                lblLocThang, nudLocThang, lblLocNam, nudLocNam,
-                btnLocThang, btnHuyLocCa
-            });
+        lblLocNgay, dtpLocNgay, btnLocNgay,
+        lblLocThang, nudLocThang, lblLocNam, nudLocNam,
+        btnLocThang, btnHuyLocCa
+    });
 
             // Panel Bottom
             pnlLichLV = new Panel();
@@ -405,9 +692,9 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             btnLLV_BackMenu = CreateButton("← Menu", 860, Color.FromArgb(52, 73, 94));
 
             pnlLichLV.Controls.AddRange(new Control[] {
-                btnLLV_ThemCa, btnLLV_SuaCa, btnLLV_XoaCa, btnLLV_SaveCa, btnLLV_CancelCa,
-                btnLLV_ThemNVCa, btnLLV_XoaNVCa, btnLLV_BackMenu
-            });
+        btnLLV_ThemCa, btnLLV_SuaCa, btnLLV_XoaCa, btnLLV_SaveCa, btnLLV_CancelCa,
+        btnLLV_ThemNVCa, btnLLV_XoaNVCa, btnLLV_BackMenu
+    });
 
             tabLichLamViec.Controls.Add(splitContainer);
             tabLichLamViec.Controls.Add(pnlFilter);
