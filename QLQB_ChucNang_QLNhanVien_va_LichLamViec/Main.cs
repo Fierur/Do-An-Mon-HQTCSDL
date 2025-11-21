@@ -40,6 +40,8 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         private TextBox txtMaCaNew, txtGioBDNew, txtGioKTNew;
         private ComboBox cboNhanVienCaLam, cboCaLamChon;
         private SplitContainer splitContainer;
+        private DateTimePicker dtpGioBD;
+        private DateTimePicker dtpGioKT;
         public frmMain()
         {
             InitializeComponent();
@@ -136,7 +138,8 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                     reader.Close();
 
                     // Lấy thông tin lương nếu có
-                    string queryLuong = @"SELECT * FROM vw_BangLuongCaNhan";
+                    string queryLuong = @"SELECT TOP 1 * FROM vw_BangLuongCaNhan
+                                            ORDER BY Nam DESC, Thang DESC";
                     SqlCommand cmdLuong = new SqlCommand(queryLuong, conn);
                     cmdLuong.Parameters.AddWithValue("@MaNV", SessionInfo.MaNV);
                     SqlDataReader readerLuong = cmdLuong.ExecuteReader();
@@ -1261,6 +1264,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             dgvTinhLuong.ReadOnly = true;
             dgvTinhLuong.AllowUserToAddRows = false;
             dgvTinhLuong.RowTemplate.Height = 30;
+            dgvTinhLuong.ColumnHeadersHeight = 35;
 
             tabTinhLuong.Controls.Add(dgvTinhLuong);
             tabTinhLuong.Controls.Add(pnlTLInput);
@@ -1287,7 +1291,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                                 bl.ThuongPhat AS [Thưởng/Phạt], 
                                 bl.TongLuong AS [Tổng Lương]
                                 FROM BangLuong bl
-                                INNER JOIN NhanVien nv ON bl.MaLuong = nv.MaLuong
+                                INNER JOIN NhanVien nv ON bl.MaNV = nv.MaNV
                                 ORDER BY bl.MaLuong DESC";
 
                 using (SqlConnection conn = DatabaseConnection.OpenConnection())

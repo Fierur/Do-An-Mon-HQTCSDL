@@ -94,18 +94,13 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         /// 
         private void InitializeLichLamViecTab()
         {
-            //SplitContainer splitContainer = new SplitContainer();
-            //splitContainer.Dock = DockStyle.Fill;
-            //splitContainer.Orientation = Orientation.Vertical;
-            //splitContainer.SplitterDistance = 300;   
-
-            splitContainer = new SplitContainer();   // ← dùng biến GLOBAL
+            splitContainer = new SplitContainer();  
             splitContainer.Dock = DockStyle.Fill;
             splitContainer.Orientation = Orientation.Vertical;
 
-            splitContainer.SplitterDistance = 350;     // set lần đầu
-            splitContainer.SplitterWidth = 4;          // chỉnh độ dày thanh kéo
-            splitContainer.IsSplitterFixed = false;    // cho phép kéo tự do
+            splitContainer.SplitterDistance = 350;     
+            splitContainer.SplitterWidth = 4;          
+            splitContainer.IsSplitterFixed = false;    
             // Panel Left - Ca làm việc
             Panel pnlLeft = new Panel();
             pnlLeft.Dock = DockStyle.Fill;
@@ -157,6 +152,16 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             txtGioBDNew = new TextBox();
             txtGioBDNew.Location = new Point(250, 42);
             txtGioBDNew.Width = 80;
+
+            //
+            DateTimePicker dtpGioBD = new DateTimePicker();
+            dtpGioBD.Location = new Point(250, 42);
+            dtpGioBD.Width = 80;
+            dtpGioBD.Format = DateTimePickerFormat.Custom;
+            dtpGioBD.CustomFormat = "HH:mm:ss";
+            dtpGioBD.ShowUpDown = true;
+            dtpGioBD.Value = DateTime.Today;
+            //
             txtGioBDNew.ForeColor = Color.Gray;
             txtGioBDNew.Text = "HH:mm:ss";
             txtGioBDNew.Enter += (s, ev) => {
@@ -182,6 +187,15 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             txtGioKTNew = new TextBox();
             txtGioKTNew.Location = new Point(80, 77);
             txtGioKTNew.Width = 80;
+            //
+            DateTimePicker dtpGioKT = new DateTimePicker();
+            dtpGioKT.Location = new Point(80, 77);
+            dtpGioKT.Width = 80;
+            dtpGioKT.Format = DateTimePickerFormat.Custom;
+            dtpGioKT.CustomFormat = "HH:mm:ss";
+            dtpGioKT.ShowUpDown = true;
+            dtpGioKT.Value = DateTime.Today;
+            //
             txtGioKTNew.ForeColor = Color.Gray;
             txtGioKTNew.Text = "HH:mm:ss";
             txtGioKTNew.Enter += (s, ev) => {
@@ -200,8 +214,8 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             };
 
             pnlCaInput.Controls.AddRange(new Control[] {
-                lblCaInputTitle, lblMaCa, txtMaCaNew, lblGioBD, txtGioBDNew,
-                lblGioKT, txtGioKTNew
+                lblCaInputTitle, lblMaCa, txtMaCaNew, lblGioBD, dtpGioBD,
+                lblGioKT, dtpGioKT
             });
 
             // Panel thống kê
