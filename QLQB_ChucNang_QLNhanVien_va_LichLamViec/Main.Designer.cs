@@ -418,8 +418,6 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             btnLLV_XoaCa.Click += btnLLV_XoaCa_Click;
             btnLLV_SaveCa.Click += btnLLV_SaveCa_Click;
             btnLLV_CancelCa.Click += btnLLV_CancelCa_Click;
-            btnLLV_ThemNVCa.Click += btnLLV_ThemNVCa_Click;
-            btnLLV_XoaNVCa.Click += btnLLV_XoaNVCa_Click;
             btnLLV_BackMenu.Click += (s, ev) => tabControl.SelectedTab = tabMenu;
         }
         private void InitializeComponent()

@@ -24,16 +24,31 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         public frmTongHopLuong()
         {
             InitializeComponent();
+
+            // Event handlers
+            this.Load += frmTongHopLuong_Load;
+            btnLoc.Click += btnLoc_Click;
+            btnDong.Click += btnDong_Click;
         }
 
         private void frmTongHopLuong_Load(object sender, EventArgs e)
         {
+            // Set giá trị mặc định
+            nudThang.Value = DateTime.Now.Month;
+            nudNam.Value = DateTime.Now.Year;
+
+            // Load dữ liệu
             LoadTongHopLuong((int)nudThang.Value, (int)nudNam.Value);
         }
 
         private void btnLoc_Click(object sender, EventArgs e)
         {
             LoadTongHopLuong((int)nudThang.Value, (int)nudNam.Value);
+        }
+
+        private void btnDong_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
 
         private void LoadTongHopLuong(int thang, int nam)
@@ -44,10 +59,10 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                                     nv.MaNV,
                                     nv.TenNV,
                                     nv.ChucVu,
-                                    bl.TongNgayLamMotThang AS [Số Ngày],
+                                    ISNULL(bl.TongNgayLamMotThang, 0) AS [Số Ngày],
                                     nv.LuongMoiGio AS [Lương/Giờ],
-                                    bl.ThuongPhat AS [Thưởng/Phạt],
-                                    bl.TongLuong AS [Tổng Lương],
+                                    ISNULL(bl.ThuongPhat, 0) AS [Thưởng/Phạt],
+                                    ISNULL(bl.TongLuong, 0) AS [Tổng Lương],
                                     bl.NgayTinhLuong AS [Ngày Tính]
                                 FROM NhanVien nv
                                 LEFT JOIN BangLuong bl ON nv.MaNV = bl.MaNV 
@@ -65,6 +80,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                     SqlDataAdapter adapter = new SqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
                     adapter.Fill(dt);
+
                     dgvTongHop.DataSource = dt;
 
                     // Format columns
@@ -101,7 +117,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             }
             if (dgvTongHop.Columns["Ngày Tính"] != null)
             {
-                dgvTongHop.Columns["Ngày Tính"].DefaultCellStyle.Format = "dd/MM/yyyy";
+                dgvTongHop.Columns["Ngày Tính"].DefaultCellStyle.Format = "dd/MM/yyyy HH:mm";
             }
 
             // Color rows
@@ -136,26 +152,21 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             {
                 if (row["Tổng Lương"] != DBNull.Value)
                 {
-                    tongNV++;
-                    tongLuong += Convert.ToDecimal(row["Tổng Lương"]);
+                    decimal tl = Convert.ToDecimal(row["Tổng Lương"]);
+                    if (tl > 0)
+                    {
+                        tongNV++;
+                        tongLuong += tl;
+                    }
                 }
             }
 
             if (tongNV > 0)
                 luongTB = tongLuong / tongNV;
 
-            var lblTongNV = pnlThongKe.Controls.Find("lblTongNV", false)[0] as Label;
-            var lblTongLuong = pnlThongKe.Controls.Find("lblTongLuong", false)[0] as Label;
-            var lblLuongTB = pnlThongKe.Controls.Find("lblLuongTB", false)[0] as Label;
-
-            if (lblTongNV != null)
-                lblTongNV.Text = $"👥 Tổng NV đã tính lương: {tongNV}";
-
-            if (lblTongLuong != null)
-                lblTongLuong.Text = $"💰 Tổng lương: {tongLuong:N0} VNĐ";
-
-            if (lblLuongTB != null)
-                lblLuongTB.Text = $"📊 Lương TB: {luongTB:N0} VNĐ";
+            lblTongNV.Text = $"👥 Tổng NV đã tính lương: {tongNV}";
+            lblTongLuong.Text = $"💰 Tổng lương: {tongLuong:N0} VNĐ";
+            lblLuongTB.Text = $"📊 Lương TB: {luongTB:N0} VNĐ";
         }
 
 
