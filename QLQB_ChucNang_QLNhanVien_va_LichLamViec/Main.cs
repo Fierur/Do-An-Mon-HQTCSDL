@@ -102,15 +102,22 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             try
             {
                 string info = "";
-                string query = "SELECT * FROM vw_ThongTinCaNhan";
-                
+
                 using (SqlConnection conn = DatabaseConnection.OpenConnection())
                 {
+                    // Dùng VIEW cho tất cả user
+                    string query = "SELECT * FROM vw_ThongTinCaNhan";
                     SqlCommand cmd = new SqlCommand(query, conn);
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     if (reader.Read())
                     {
+                        string gioBD = reader["GioBD"] != DBNull.Value ?
+                            ((TimeSpan)reader["GioBD"]).ToString(@"hh\:mm") : "Chưa có";
+                        string gioKT = reader["GioKT"] != DBNull.Value ?
+                            ((TimeSpan)reader["GioKT"]).ToString(@"hh\:mm") : "Chưa có";
+
+
                         info = $"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
                                $"           THÔNG TIN CÁ NHÂN\n" +
                                $"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" +
@@ -121,27 +128,30 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                                $"  ⚧  Giới tính:         {reader["GioiTinh"]}\n" +
                                $"  💰 Lương/giờ:       {Convert.ToDecimal(reader["LuongMoiGio"]):N0} VNĐ\n" +
                                $"  🔑 Quyền:            {reader["TenQuyen"]}\n\n" +
-                               $"  📅 Ca làm việc:    {reader["MaCa"]}\n" +
-                               $"  ⏰ Giờ:                 {(reader["GioBD"] != DBNull.Value ? ((TimeSpan)reader["GioBD"]).ToString(@"hh\:mm") : "")} - " +
-                               $"{(reader["GioKT"] != DBNull.Value ? ((TimeSpan)reader["GioKT"]).ToString(@"hh\:mm") : "")}\n" +
+                               $"  📅 Ca làm việc:    {(reader["MaCa"] != DBNull.Value ? reader["MaCa"].ToString() : "Chưa có")}\n" +
+                               $"  ⏰ Giờ:                 {gioBD} - {gioKT}\n" +
                                $"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
                     }
                     reader.Close();
 
                     // Lấy thông tin lương nếu có
-                    string queryLuong = "SELECT * FROM vw_BangLuongCaNhan";
+                    string queryLuong = @"SELECT * FROM vw_BangLuongCaNhan";
                     SqlCommand cmdLuong = new SqlCommand(queryLuong, conn);
+                    cmdLuong.Parameters.AddWithValue("@MaNV", SessionInfo.MaNV);
                     SqlDataReader readerLuong = cmdLuong.ExecuteReader();
 
-                    if (readerLuong.Read())
+                    if (readerLuong.HasRows)
                     {
+                        readerLuong.Read(); 
                         info += $"\n\n━━━━━━ THÔNG TIN LƯƠNG GẦN NHẤT ━━━━━━\n" +
-                               $"  📊 Mã lương:        {readerLuong["MaLuong"]}\n" +
-                               $"  📅 Số ngày làm:    {readerLuong["TongNgayLamMotThang"]} ngày\n" +
-                               $"  💵 Thưởng/Phạt:   {Convert.ToDecimal(readerLuong["ThuongPhat"]):N0} VNĐ\n" +
-                               $"  💰 Tổng lương:     {Convert.ToDecimal(readerLuong["TongLuong"]):N0} VNĐ\n" +
-                               $"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+                                $"  📊 Mã lương:        {readerLuong["MaLuong"]}\n" +
+                                $"  📅 Số ngày làm:    {readerLuong["TongNgayLamMotThang"]} ngày\n" +
+                                $"  💵 Thưởng/Phạt:   {Convert.ToDecimal(readerLuong["ThuongPhat"] == DBNull.Value ? 0 : readerLuong["ThuongPhat"]):N0} VNĐ\n" +
+                                $"  💰 Tổng lương:     {Convert.ToDecimal(readerLuong["TongLuong"] == DBNull.Value ? 0 : readerLuong["TongLuong"]):N0} VNĐ\n" +
+                                $"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
                     }
+                    
+                    readerLuong.Close();
                 }
 
                 MessageBox.Show(info, "Thông tin cá nhân", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -155,41 +165,77 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         private void frmMain_Load(object sender, EventArgs e)
         {
             lblMenuWelcome.Text = $"Chào mừng, {SessionInfo.TenNV}";
-            
+
             // Xóa pnlHeader khỏi form chính
             if (this.Controls.Contains(pnlHeader))
             {
                 this.Controls.Remove(pnlHeader);
             }
 
-            // Thêm header vào tab Menu
+            // Thêm header vào tab Menu - HIỂN THỊ CHO TẤT CẢ
             if (!tabMenu.Controls.Contains(pnlMenuHeader))
             {
                 tabMenu.Controls.Add(pnlMenuHeader);
                 pnlMenuHeader.BringToFront();
             }
 
-            tabControl.SelectedTab = tabMenu;
-            CheckPermissions();
-        }
-
-        private void CheckPermissions()
-        {
+            // Kiểm tra quyền và điều chỉnh UI
             if (!SessionInfo.IsAdmin)
             {
-                // Ẩn các nút menu cho nhân viên thường
+                // Ẩn các nút menu không cần thiết
                 btnMenuQLNV.Visible = false;
                 btnMenuTinhLuong.Visible = false;
                 btnMenuLichLV.Visible = false;
+
+                // Căn giữa nút Chấm công
+                CenterMenuButton();
 
                 // Xóa các tab không được phép
                 tabControl.TabPages.Remove(tabQuanLyNV);
                 tabControl.TabPages.Remove(tabTinhLuong);
                 tabControl.TabPages.Remove(tabLichLamViec);
-                tabControl.TabPages.Remove(tabMenu);
 
-                // Chuyển sang tab chấm công
-                tabControl.SelectedTab = tabChamCong;
+                // Mặc định hiển thị tab Menu
+                tabControl.SelectedTab = tabMenu;
+            }
+            else
+            {
+                tabControl.SelectedTab = tabMenu;
+            }
+
+            CheckPermissions();
+        }
+
+        private void CenterMenuButton()
+        {
+            // Căn giữa nút Chấm công khi chỉ còn 1 nút
+            if (pnlMenuMain != null && btnMenuChamCong != null)
+            {
+                int centerX = (pnlMenuMain.Width - btnMenuChamCong.Width) / 2;
+                int centerY = (pnlMenuMain.Height - btnMenuChamCong.Height) / 2;
+                btnMenuChamCong.Location = new Point(centerX, centerY);
+
+                // Resize event để nút luôn ở giữa khi resize form
+                pnlMenuMain.Resize += (s, e) =>
+                {
+                    if (!SessionInfo.IsAdmin && btnMenuChamCong.Visible)
+                    {
+                        centerX = (pnlMenuMain.Width - btnMenuChamCong.Width) / 2;
+                        centerY = (pnlMenuMain.Height - btnMenuChamCong.Height) / 2;
+                        btnMenuChamCong.Location = new Point(centerX, centerY);
+                    }
+                };
+            }
+        }
+
+
+        private void CheckPermissions()
+        {
+            // Hàm này giờ chỉ để kiểm tra, UI đã được xử lý ở frmMain_Load
+            if (!SessionInfo.IsAdmin)
+            {
+                // Log hoặc xử lý thêm nếu cần
+                System.Diagnostics.Debug.WriteLine($"Nhân viên {SessionInfo.MaNV} - Quyền hạn chế");
             }
         }
 
@@ -247,22 +293,24 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         #endregion
 
         #region Quản Lý Nhân Viên
+ 
         private void InitializeQLNVTab()
         {
             pnlNVInput = new Panel();
             pnlNVInput.Dock = DockStyle.Top;
-            pnlNVInput.Height = 280;
+            pnlNVInput.Height = 180; // Giảm từ 280 xuống 180
             pnlNVInput.BackColor = Color.FromArgb(245, 245, 245);
             pnlNVInput.Padding = new Padding(10);
 
-            Label lblMaNV = new Label { Text = "Mã NV:", Location = new Point(20, 15), AutoSize = true };
-            txtMaNV = new TextBox { Location = new Point(150, 12), Width = 150, ReadOnly = true, BackColor = Color.LightGray };
+            // Column 1
+            Label lblMaNV = new Label { Text = "Mã NV: *", Location = new Point(20, 15), AutoSize = true };
+            txtMaNV = new TextBox { Location = new Point(120, 12), Width = 150, ReadOnly = false};
 
-            Label lblTenNV = new Label { Text = "Tên NV: *", Location = new Point(320, 15), AutoSize = true };
-            txtTenNV = new TextBox { Location = new Point(420, 12), Width = 200 };
+            Label lblTenNV = new Label { Text = "Tên NV: *", Location = new Point(290, 15), AutoSize = true };
+            txtTenNV = new TextBox { Location = new Point(380, 12), Width = 200 };
 
-            Label lblChucVu = new Label { Text = "Chức vụ: *", Location = new Point(640, 15), AutoSize = true };
-            cboChucVu = new ComboBox { Location = new Point(740, 12), Width = 180, DropDownStyle = ComboBoxStyle.DropDownList };
+            Label lblChucVu = new Label { Text = "Chức vụ: *", Location = new Point(600, 15), AutoSize = true };
+            cboChucVu = new ComboBox { Location = new Point(690, 12), Width = 180, DropDownStyle = ComboBoxStyle.DropDownList };
             cboChucVu.SelectedIndexChanged += (s, ev) =>
             {
                 if (cboChucVu.SelectedItem != null)
@@ -272,26 +320,31 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                 }
             };
 
+            // Column 2
             Label lblNgaySinh = new Label { Text = "Ngày sinh: *", Location = new Point(20, 55), AutoSize = true };
-            dtpNgaySinh = new DateTimePicker { Location = new Point(150, 52), Width = 150, Format = DateTimePickerFormat.Short, MaxDate = DateTime.Now.AddYears(-17) };
+            dtpNgaySinh = new DateTimePicker { Location = new Point(120, 52), Width = 150, Format = DateTimePickerFormat.Short, MaxDate = DateTime.Now.AddYears(-17) };
 
-            Label lblGioiTinh = new Label { Text = "Giới tính: *", Location = new Point(320, 55), AutoSize = true };
-            cboGioiTinh = new ComboBox { Location = new Point(420, 52), Width = 100, DropDownStyle = ComboBoxStyle.DropDownList };
+            Label lblGioiTinh = new Label { Text = "Giới tính: *", Location = new Point(290, 55), AutoSize = true };
+            cboGioiTinh = new ComboBox { Location = new Point(380, 52), Width = 100, DropDownStyle = ComboBoxStyle.DropDownList };
             cboGioiTinh.Items.AddRange(new object[] { "Nam", "Nữ" });
             cboGioiTinh.SelectedIndex = 0;
 
-            Label lblTrangThai = new Label { Text = "Trạng thái: *", Location = new Point(540, 55), AutoSize = true };
-            cboTrangThai = new ComboBox { Location = new Point(640, 52), Width = 150, DropDownStyle = ComboBoxStyle.DropDownList };
+            Label lblTrangThai = new Label { Text = "Trạng thái: *", Location = new Point(500, 55), AutoSize = true };
+            cboTrangThai = new ComboBox { Location = new Point(600, 52), Width = 150, DropDownStyle = ComboBoxStyle.DropDownList };
             cboTrangThai.Items.AddRange(new object[] { "Đang làm", "Tạm nghỉ", "Nghỉ việc" });
             cboTrangThai.SelectedIndex = 0;
 
-            Label lblMatKhau = new Label { Text = "Mật khẩu: *", Location = new Point(20, 95), AutoSize = true };
-            txtMatKhau = new TextBox { Location = new Point(150, 92), Width = 200 };
+            Label lblQuyen = new Label { Text = "Quyền:", Location = new Point(770, 55), AutoSize = true };
+            txtMaQuyen = new TextBox { Location = new Point(830, 52), Width = 150, ReadOnly = true, BackColor = Color.WhiteSmoke };
 
-            Label lblLuong = new Label { Text = "Lương/giờ: *", Location = new Point(370, 95), AutoSize = true };
+            // Column 3
+            Label lblMatKhau = new Label { Text = "Mật khẩu: *", Location = new Point(20, 95), AutoSize = true };
+            txtMatKhau = new TextBox { Location = new Point(120, 92), Width = 200 };
+
+            Label lblLuong = new Label { Text = "Lương/giờ: *", Location = new Point(340, 95), AutoSize = true };
             nudLuongMoiGio = new NumericUpDown
             {
-                Location = new Point(470, 92),
+                Location = new Point(440, 92),
                 Width = 150,
                 Minimum = 10000,
                 Maximum = 1000000,
@@ -300,13 +353,10 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                 ThousandsSeparator = true
             };
 
-            Label lblQuyen = new Label { Text = "Quyền:", Location = new Point(640, 95), AutoSize = true };
-            txtMaQuyen = new TextBox { Location = new Point(740, 92), Width = 180, ReadOnly = true, BackColor = Color.WhiteSmoke };
-
             Button btnGenMaNV = new Button
             {
                 Text = "🔄 Tạo mã",
-                Location = new Point(20, 140),
+                Location = new Point(20, 135),
                 Size = new Size(100, 35),
                 BackColor = Color.FromArgb(155, 89, 182),
                 ForeColor = Color.White,
@@ -433,6 +483,8 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
 
         private void LoadChucVuData()
         {
+            if (!SessionInfo.IsAdmin)
+                return;
             try
             {
                 using (SqlConnection conn = DatabaseConnection.OpenConnection())
@@ -496,10 +548,18 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                 txtMaNV.Text = "NV01";
             }
         }
-       
+
 
         private void LoadNhanVienData()
         {
+            // Chỉ load khi là quản lý
+            if (!SessionInfo.IsAdmin)
+            {
+                // Clear data để tránh hiển thị dữ liệu cũ
+                if (dtNhanVien != null)
+                    dtNhanVien.Clear();
+                return;
+            }
             try
             {
                 string query = @"SELECT MaNV, TenNV, ChucVu, NgaySinh, GioiTinh, MatKhau, 
@@ -844,7 +904,8 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             btnLocChamCong.BackColor = Color.FromArgb(52, 152, 219);
             btnLocChamCong.ForeColor = Color.White;
             btnLocChamCong.FlatStyle = FlatStyle.Flat;
-            btnLocChamCong.Click += (s, ev) => {
+            btnLocChamCong.Click += (s, ev) =>
+            {
                 LoadChamCongDataFiltered((int)nudLocThang.Value, (int)nudLocNam.Value);
             };
 
@@ -885,15 +946,15 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
 
             if (SessionInfo.IsAdmin)
             {
-                pnlChamCong.Controls.AddRange(new Control[] {
-                    btnCC_Them, btnCC_Xoa, btnCC_BackMenu
-                });
+                pnlChamCong.Controls.AddRange(new Control[] { btnCC_Them, btnCC_Xoa, btnCC_BackMenu });
             }
             else
             {
-                pnlChamCong.Controls.AddRange(new Control[] {
-                    btnCC_Them, btnThongTinCaNhan
-                });
+                // Nhân viên thường chỉ có nút chấm công và nút quay về menu
+                Button btnBackMenuNV = CreateButton("← Menu", 140, Color.FromArgb(52, 73, 94));
+                btnBackMenuNV.Click += (s, ev) => tabControl.SelectedTab = tabMenu;
+
+                pnlChamCong.Controls.AddRange(new Control[] { btnCC_Them, btnBackMenuNV });
             }
 
             dgvChamCong = new DataGridView();
@@ -946,7 +1007,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                     if (dgvChamCong.Columns["SoGioLam"] != null)
                         dgvChamCong.Columns["SoGioLam"].HeaderText = "Giờ Làm (8h/ngày)";
 
-                    if (SessionInfo.IsAdmin)
+                    if (SessionInfo.IsAdmin && cboNhanVienCC != null)
                     {
                         SqlCommand cmd = new SqlCommand("SELECT MaNV, TenNV FROM NhanVien ORDER BY MaNV", conn);
                         SqlDataReader reader = cmd.ExecuteReader();
@@ -1020,13 +1081,22 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         private void btnCC_Them_Click(object sender, EventArgs e)
         {
             string maNV;
+            DateTime ngay = dtpChamCong.Value.Date;
 
             if (!SessionInfo.IsAdmin)
             {
+                // Nhân viên thường chỉ chấm công ngày hiện tại
+                if (ngay != DateTime.Now.Date)
+                {
+                    MessageBox.Show("Nhân viên chỉ được chấm công cho ngày hiện tại!\nNếu cần chấm công bù, vui lòng liên hệ quản lý.",
+                        "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
                 maNV = SessionInfo.MaNV;
             }
             else
             {
+                // Quản lý có thể chấm công cho bất kỳ nhân viên nào và bất kỳ ngày nào
                 if (cboNhanVienCC.SelectedItem == null)
                 {
                     MessageBox.Show("Vui lòng chọn nhân viên!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -1038,8 +1108,6 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
 
             try
             {
-                DateTime ngay = dtpChamCong.Value.Date;
-
                 using (SqlConnection conn = DatabaseConnection.OpenConnection())
                 {
                     SqlCommand checkCmd = new SqlCommand(
@@ -1050,7 +1118,8 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                     int count = (int)checkCmd.ExecuteScalar();
                     if (count > 0)
                     {
-                        MessageBox.Show("Đã chấm công ngày này!\n(Một ngày chỉ chấm công 1 lần = 8 giờ)", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("Đã chấm công ngày này!\n(Một ngày chỉ chấm công 1 lần = 8 giờ)",
+                            "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         return;
                     }
 
@@ -1060,7 +1129,8 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                     cmd.Parameters.AddWithValue("@MaNV", maNV);
                     cmd.ExecuteNonQuery();
 
-                    MessageBox.Show("✓ Chấm công thành công!\n(Tính 8 giờ làm việc)", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("✓ Chấm công thành công!\n(Tính 8 giờ làm việc)",
+                        "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     LoadChamCongData();
                 }
             }
@@ -1201,6 +1271,12 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
 
         private void LoadTinhLuongData()
         {
+            if (!SessionInfo.IsAdmin)
+            {
+                if (dtTinhLuong != null)
+                    dtTinhLuong.Clear();
+                return;
+            }
             try
             {
                 string query = @"SELECT bl.MaLuong, nv.MaNV, nv.TenNV, nv.ChucVu,
@@ -1359,7 +1435,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         #endregion
 
         #region Lịch Làm Việc
-        
+
 
         private void LoadLichLamViecData()
         {
@@ -1420,7 +1496,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             {
                 string maCa = dgvCaLam.SelectedRows[0].Cells["MaCa"].Value.ToString();
                 txtMaCaNew.Text = maCa;
-                
+
                 string gioBD = dgvCaLam.SelectedRows[0].Cells["GioBatDau"].Value.ToString();
                 string gioKT = dgvCaLam.SelectedRows[0].Cells["GioKetThuc"].Value.ToString();
                 txtGioBDNew.Text = gioBD;
@@ -1532,8 +1608,8 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(txtMaCaNew.Text) || 
-                string.IsNullOrWhiteSpace(txtGioBDNew.Text) || 
+            if (string.IsNullOrWhiteSpace(txtMaCaNew.Text) ||
+                string.IsNullOrWhiteSpace(txtGioBDNew.Text) ||
                 string.IsNullOrWhiteSpace(txtGioKTNew.Text))
             {
                 MessageBox.Show("Vui lòng nhập đầy đủ thông tin ca làm!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -1547,7 +1623,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                     string checkQuery = "SELECT COUNT(*) FROM LichLamViec WHERE MaCa = @MaCa";
                     SqlCommand checkCmd = new SqlCommand(checkQuery, conn);
                     checkCmd.Parameters.AddWithValue("@MaCa", txtMaCaNew.Text.Trim());
-                    
+
                     if ((int)checkCmd.ExecuteScalar() > 0)
                     {
                         MessageBox.Show("Mã ca đã tồn tại!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -1643,7 +1719,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
 
             string maCa = dgvCaLam.SelectedRows[0].Cells["MaCa"].Value.ToString();
 
-            if (MessageBox.Show($"Xóa ca {maCa}?\n(Nhân viên thuộc ca này sẽ bị xóa ca làm)", "Xác nhận", 
+            if (MessageBox.Show($"Xóa ca {maCa}?\n(Nhân viên thuộc ca này sẽ bị xóa ca làm)", "Xác nhận",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 try
@@ -1722,7 +1798,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                     cmd.ExecuteNonQuery();
 
                     MessageBox.Show("✓ Gán ca làm việc cho nhân viên thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    
+
                     if (dgvCaLam.SelectedRows.Count > 0)
                     {
                         string currentCa = dgvCaLam.SelectedRows[0].Cells["MaCa"].Value.ToString();
@@ -1753,7 +1829,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             string maNV = dgvNhanVienCa.SelectedRows[0].Cells["MaNV"].Value.ToString();
             string tenNV = dgvNhanVienCa.SelectedRows[0].Cells["TenNV"].Value.ToString();
 
-            if (MessageBox.Show($"Bỏ ca làm của nhân viên {tenNV}?", "Xác nhận", 
+            if (MessageBox.Show($"Bỏ ca làm của nhân viên {tenNV}?", "Xác nhận",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 try
@@ -1766,7 +1842,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                         cmd.ExecuteNonQuery();
 
                         MessageBox.Show("✓ Bỏ ca làm việc thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        
+
                         if (dgvCaLam.SelectedRows.Count > 0)
                         {
                             string currentCa = dgvCaLam.SelectedRows[0].Cells["MaCa"].Value.ToString();
