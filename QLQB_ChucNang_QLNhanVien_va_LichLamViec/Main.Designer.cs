@@ -447,6 +447,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             dgvCaLam.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvCaLam.ReadOnly = true;
             dgvCaLam.AllowUserToAddRows = false;
+            dgvCaLam.RowHeadersVisible = false;
             dgvCaLam.RowTemplate.Height = 30;
             dgvCaLam.SelectionChanged += dgvCaLam_SelectionChanged;
 
@@ -554,6 +555,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             dgvNhanVienCa.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvNhanVienCa.ReadOnly = true;
             dgvNhanVienCa.AllowUserToAddRows = false;
+            dgvNhanVienCa.RowHeadersVisible = false;
             dgvNhanVienCa.RowTemplate.Height = 30;
 
             // ============ PANEL ĐIỀU CHỈNH NV CA ============
