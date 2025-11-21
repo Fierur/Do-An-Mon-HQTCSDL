@@ -31,6 +31,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             this.tenNV = tenNV;
             InitializeComponent();
         }
+       
         private void frmTinhLuongDialog_Load(object sender, EventArgs e)
         {
             LoadThongTinThang();

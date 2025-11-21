@@ -24,6 +24,8 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             base.Dispose(disposing);
         }
 
+        
+
         #region Windows Form Designer generated code
 
         /// <summary>
@@ -137,6 +139,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             nudThuongPhat.Minimum = -10000000;
             nudThuongPhat.Maximum = 10000000;
             nudThuongPhat.Value = 0;
+            nudThuongPhat.Increment = 50000;
             nudThuongPhat.ThousandsSeparator = true;
 
             // Note

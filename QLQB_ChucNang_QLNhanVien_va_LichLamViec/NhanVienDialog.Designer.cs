@@ -121,26 +121,14 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             // nudLuongMoiGio
             // 
             this.nudLuongMoiGio.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.nudLuongMoiGio.Increment = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
+            this.nudLuongMoiGio.Increment = new decimal(new int[] { 1000, 0, 0, 0});
             this.nudLuongMoiGio.Location = new System.Drawing.Point(170, 227);
-            this.nudLuongMoiGio.Maximum = new decimal(new int[] {
-            1000000,
-            0,
-            0,
-            0});
+            this.nudLuongMoiGio.Maximum = new decimal(new int[] { 1000000, 0, 0, 0});
             this.nudLuongMoiGio.Name = "nudLuongMoiGio";
             this.nudLuongMoiGio.Size = new System.Drawing.Size(240, 25);
             this.nudLuongMoiGio.TabIndex = 11;
             this.nudLuongMoiGio.ThousandsSeparator = true;
-            this.nudLuongMoiGio.Value = new decimal(new int[] {
-            50000,
-            0,
-            0,
-            0});
+            this.nudLuongMoiGio.Value = new decimal(new int[] { 50000, 0, 0, 0});
             // 
             // cboChucVu
             // 
