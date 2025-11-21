@@ -429,7 +429,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             splitContainer.SplitterWidth = 4;
             splitContainer.IsSplitterFixed = false;
 
-            // Panel Left - Ca làm việc
+            // ============ PANEL TRÁI ============
             Panel pnlLeft = new Panel();
             pnlLeft.Dock = DockStyle.Fill;
 
@@ -450,7 +450,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             dgvCaLam.RowTemplate.Height = 30;
             dgvCaLam.SelectionChanged += dgvCaLam_SelectionChanged;
 
-            // Panel input ca làm mới
+            // ============ PANEL INPUT CA LÀM ============
             pnlCaInput = new Panel();
             pnlCaInput.Location = new Point(20, 250);
             pnlCaInput.Size = new Size(450, 120);
@@ -477,35 +477,33 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             lblGioBD.Location = new Point(180, 45);
             lblGioBD.AutoSize = true;
 
-            // Đặt định dạng HH:mm:ss
             dtpGioBD = new DateTimePicker();
             dtpGioBD.Location = new Point(250, 42);
             dtpGioBD.Width = 100;
             dtpGioBD.Format = DateTimePickerFormat.Custom;
             dtpGioBD.CustomFormat = "HH:mm:ss";
             dtpGioBD.ShowUpDown = true;
-            dtpGioBD.Value = DateTime.Today;
+            dtpGioBD.Value = DateTime.Today.AddHours(13);
 
             Label lblGioKT = new Label();
             lblGioKT.Text = "Giờ KT:";
             lblGioKT.Location = new Point(15, 80);
             lblGioKT.AutoSize = true;
 
-            // Đặt định dạng HH:mm:ss
             dtpGioKT = new DateTimePicker();
             dtpGioKT.Location = new Point(80, 77);
             dtpGioKT.Width = 100;
             dtpGioKT.Format = DateTimePickerFormat.Custom;
             dtpGioKT.CustomFormat = "HH:mm:ss";
             dtpGioKT.ShowUpDown = true;
-            dtpGioKT.Value = DateTime.Today;
+            dtpGioKT.Value = DateTime.Today.AddHours(21);
 
             pnlCaInput.Controls.AddRange(new Control[] {
         lblCaInputTitle, lblMaCa, txtMaCaNew, lblGioBD, dtpGioBD,
         lblGioKT, dtpGioKT
     });
 
-            // Panel thống kê
+            // ============ PANEL THỐNG KÊ ============
             pnlThongKeCa = new Panel();
             pnlThongKeCa.Location = new Point(20, 375);
             pnlThongKeCa.Size = new Size(450, 100);
@@ -538,7 +536,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             pnlLeft.Controls.AddRange(new Control[] { lblCaLam, dgvCaLam, pnlCaInput, pnlThongKeCa });
             splitContainer.Panel1.Controls.Add(pnlLeft);
 
-            // Panel Right - Nhân viên theo ca
+            // ============ PANEL PHẢI ============
             Panel pnlRight = new Panel();
             pnlRight.Dock = DockStyle.Fill;
 
@@ -558,7 +556,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             dgvNhanVienCa.AllowUserToAddRows = false;
             dgvNhanVienCa.RowTemplate.Height = 30;
 
-            // Panel điều chỉnh nhân viên ca
+            // ============ PANEL ĐIỀU CHỈNH NV CA ============
             Panel pnlNVCaInput = new Panel();
             pnlNVCaInput.Location = new Point(20, 375);
             pnlNVCaInput.Size = new Size(580, 80);
@@ -598,7 +596,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             pnlRight.Controls.AddRange(new Control[] { lblNhanVienCa, dgvNhanVienCa, pnlNVCaInput });
             splitContainer.Panel2.Controls.Add(pnlRight);
 
-            // Panel Filter
+            // ============ PANEL FILTER ============
             Panel pnlFilter = new Panel();
             pnlFilter.Dock = DockStyle.Top;
             pnlFilter.Height = 70;
@@ -676,7 +674,7 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         btnLocThang, btnHuyLocCa
     });
 
-            // Panel Bottom
+            // ============ PANEL BOTTOM ============
             pnlLichLV = new Panel();
             pnlLichLV.Dock = DockStyle.Bottom;
             pnlLichLV.Height = 60;
@@ -696,15 +694,19 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
         btnLLV_ThemNVCa, btnLLV_XoaNVCa, btnLLV_BackMenu
     });
 
+            // ============ ADD TO TAB ============
             tabLichLamViec.Controls.Add(splitContainer);
             tabLichLamViec.Controls.Add(pnlFilter);
             tabLichLamViec.Controls.Add(pnlLichLV);
 
+            // ============ EVENT HANDLERS ============
             btnLLV_ThemCa.Click += btnLLV_ThemCa_Click;
             btnLLV_SuaCa.Click += btnLLV_SuaCa_Click;
             btnLLV_XoaCa.Click += btnLLV_XoaCa_Click;
             btnLLV_SaveCa.Click += btnLLV_SaveCa_Click;
             btnLLV_CancelCa.Click += btnLLV_CancelCa_Click;
+            btnLLV_ThemNVCa.Click += btnLLV_ThemNVCa_Click;
+            btnLLV_XoaNVCa.Click += btnLLV_XoaNVCa_Click;
             btnLLV_BackMenu.Click += (s, ev) => tabControl.SelectedTab = tabMenu;
         }
         private void InitializeComponent()

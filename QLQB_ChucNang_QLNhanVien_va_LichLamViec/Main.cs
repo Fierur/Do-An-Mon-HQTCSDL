@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 
 namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
@@ -449,6 +450,11 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                         break;
                 }
             }
+            if (dgvNhanVien.Columns[e.ColumnIndex].Name == "GioiTinh" && e.Value != null)
+            {
+                e.Value = e.Value.ToString().Trim();
+                e.FormattingApplied = true;
+            }
         }
 
         private void dgvNhanVien_SelectionChanged(object sender, EventArgs e)
@@ -533,34 +539,6 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             }
         }
 
-        //private void GenerateNewMaNV()
-        //{
-        //    try
-        //    {
-        //        using (SqlConnection conn = DatabaseConnection.OpenConnection())
-        //        {
-        //            string query = "SELECT TOP 1 MaNV FROM NhanVien ORDER BY MaNV DESC";
-        //            SqlCommand cmd = new SqlCommand(query, conn);
-        //            object result = cmd.ExecuteScalar();
-
-        //            if (result != null)
-        //            {
-        //                string lastMaNV = result.ToString();
-        //                int number = int.Parse(lastMaNV.Substring(2));
-        //                txtMaNV.Text = "NV" + (number + 1).ToString("D2");
-        //            }
-        //            else
-        //            {
-        //                txtMaNV.Text = "NV01";
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //        txtMaNV.Text = "NV01";
-        //    }
-        //}
         private void GenerateNewMaNV()
         {
             try
@@ -627,6 +605,13 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                     SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
                     dtNhanVien = new DataTable();
                     adapter.Fill(dtNhanVien);
+                    foreach (DataRow row in dtNhanVien.Rows)
+                    {
+                        if (row["GioiTinh"] != null)
+                        {
+                            row["GioiTinh"] = row["GioiTinh"].ToString().Trim();
+                        }
+                    }
                     dgvNhanVien.DataSource = dtNhanVien;
 
                     if (dgvNhanVien.Columns["NgaySinh"] != null)
@@ -681,7 +666,21 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
                 MessageBox.Show("Bạn không có quyền thêm nhân viên!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-
+            if (cboGioiTinh.SelectedItem == null)
+            {
+                MessageBox.Show("Vui lòng chọn giới tính!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            if (txtMatKhau.Text.Trim() == null)
+            {
+                MessageBox.Show("Vui lòng nhập mật khẩu đăng nhập!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            if (txtMaNV.Text.Trim() == null)
+            {
+                MessageBox.Show("Vui lòng nhập tên nhân viên!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
             if (!ValidateNhanVienInput()) return;
 
             dynamic selectedItem = cboChucVu.SelectedItem;
@@ -885,7 +884,6 @@ namespace QLQB_ChucNang_QLNhanVien_va_LichLamViec
             txtMaNV.Clear();
             txtTenNV.Clear();
             txtMatKhau.Clear();
-            //dtpNgaySinh.Value = DateTime.Now.AddYears(-18);
             DateTime macDinh = DateTime.Now.AddYears(-18);
             if (macDinh < dtpNgaySinh.MinDate)
                 macDinh = dtpNgaySinh.MinDate;
